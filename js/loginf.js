@@ -15,9 +15,10 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   if (result.success) {
     sessionStorage.setItem("token", result.token);
     sessionStorage.setItem("loggedUser", result.user);
-    window.location.href = "painel.html";
+    window.location.href = "6bh1xntg0kegg8kp.html";
   } else {
     document.getElementById("errorMsg").textContent = "Usuário ou senha inválidos!";
   }
 });
+
 
