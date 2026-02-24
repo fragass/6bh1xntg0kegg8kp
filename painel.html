@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+        <link rel="icon" href="favicon.png" type="image/png">
+<script>
+  if (!sessionStorage.getItem("token")) {
+    window.location.href = "login.html";
+  }
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Página inicial - Workday</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0d1117;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #e6edf3;
+}
+
+/* Scroll minimalista */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #30363d #0d1117;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+.container {
+  width: 340px;
+  padding: 32px;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background: #0d1117;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+input:focus {
+  border-color: #58a6ff;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  background: #da3633;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #f85149;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <input type="password" id="password" placeholder="Senha admin">
+  <button onclick="deleteMessages()">Apagar Todas as Mensagens</button>
+</div>
+
+<script>
+async function deleteMessages() {
+  const password = document.getElementById("password").value;
+
+  if (!password) return;
+
+  const res = await fetch("/api/admin-delete", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ password })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    alert("Mensagens apagadas com sucesso.");
+  } else {
+    alert("Erro: " + (data.error || "Falha ao apagar."));
+  }
+}
+</script>
+
+</body>
+</html>
+
+
