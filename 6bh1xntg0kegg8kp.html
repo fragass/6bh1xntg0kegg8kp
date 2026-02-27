@@ -1,298 +1,172 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="icon" href="favicon.png" type="image/png">
+<link rel="icon" href="favicon.png" type="image/png">
 
-  <script>
-    if (!sessionStorage.getItem("token")) {
-      window.location.href = "index.html";
-    }
-  </script>
+<script>
+  if (!sessionStorage.getItem("token")) {
+    window.location.href = "index.html";
+  }
+</script>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página inicial - Workday</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Página inicial - Workday</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      height: 100vh;
-      display: flex;
-      background: #0d1117;
-      color: #e6edf3;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    }
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  background: #0d1117;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #e6edf3;
+}
 
-    /* SIDEBAR */
-    .sidebar {
-      width: 220px;
-      background: #161b22;
-      border-right: 1px solid #21262d;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+.sidebar {
+  width: 220px;
+  background: #161b22;
+  border-right: 1px solid #21262d;
+  padding: 24px;
+}
 
-    .sidebar h2 {
-      font-size: 16px;
-      color: #58a6ff;
-    }
+.sidebar button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: none;
+  border: 1px solid #30363d;
+  color: #e6edf3;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    .nav-item {
-      padding: 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #0d1117;
-      border: 1px solid #21262d;
-      font-size: 14px;
-      user-select: none;
-      transition: background 0.2s ease, transform 0.15s ease;
-    }
+.sidebar button:hover {
+  background: #21262d;
+}
 
-    .nav-item:hover {
-      transform: translateX(4px);
-    }
+.main {
+  flex: 1;
+  padding: 40px;
+  animation: fadeIn 0.4s ease;
+}
 
-    .nav-item.active {
-      background: #1f6feb;
-      border-color: #1f6feb;
-      color: #fff;
-    }
+.card {
+  max-width: 420px;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 10px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-    /* MAIN */
-    .main {
-      flex: 1;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      overflow-y: auto;
-    }
+input {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background: #0d1117;
+  color: #fff;
+}
 
-    .title {
-      font-size: 22px;
-      font-weight: 600;
-      animation: fadeDown 0.4s ease;
-    }
+button.action {
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-    .subtitle {
-      font-size: 14px;
-      color: #8b949e;
-      margin-top: 6px;
-      animation: fadeDown 0.5s ease;
-    }
+.danger {
+  background: #da3633;
+}
 
-    .section {
-      display: none;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-      animation: fadeUp 0.35s ease;
-    }
+.danger:hover {
+  background: #f85149;
+}
 
-    .section.active {
-      display: grid;
-    }
-
-    .card {
-      background: #161b22;
-      border: 1px solid #21262d;
-      border-radius: 10px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    .card h3 {
-      font-size: 16px;
-    }
-
-    .danger h3 {
-      color: #f85149;
-    }
-
-    .card p {
-      font-size: 13px;
-      color: #8b949e;
-      line-height: 1.4;
-    }
-
-    input {
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #30363d;
-      background: #0d1117;
-      color: #fff;
-      outline: none;
-      font-size: 14px;
-    }
-
-    input:focus {
-      border-color: #58a6ff;
-    }
-
-    button {
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #da3633;
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.15s ease;
-    }
-
-    button:hover {
-      background: #f85149;
-      transform: translateY(-1px);
-    }
-
-    /* ANIMAÇÕES */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2>Admin</h2>
-    <div class="nav-item active" onclick="showSection('home', this)">🏠 Início</div>
-    <div class="nav-item" onclick="showSection('messages', this)">🗑️ Mensagens</div>
-  </aside>
+<div class="sidebar">
+  <button onclick="show('home')">Início</button>
+  <button onclick="show('messages')">Mensagens</button>
+</div>
 
-  <!-- MAIN -->
-  <main class="main">
+<div class="main" id="content"></div>
 
-    <!-- HEADER (SÓ NO INÍCIO) -->
-    <div id="home-header">
-      <div class="title">Bem-vindo ao painel administrativo</div>
-      <div class="subtitle">
-        Utilize este painel para gerenciar funções internas do sistema.
-      </div>
-    </div>
+<script>
+function show(section) {
+  const content = document.getElementById("content");
 
-    <!-- HOME -->
-    <div class="section active" id="home">
+  if (section === "home") {
+    content.innerHTML = `
+      <h2>Bem-vindo ao painel admin</h2>
+      <p>Gerencie mensagens, imagens e dados do sistema.</p>
+    `;
+  }
+
+  if (section === "messages") {
+    content.innerHTML = `
       <div class="card">
-        <h3>Status do sistema</h3>
-        <p>
-          Use o menu lateral para acessar as funções administrativas disponíveis.
-        </p>
+        <input type="password" id="password" placeholder="Senha admin">
+
+        <button class="action danger" onclick="deleteMessages()">
+          Apagar todas as mensagens
+        </button>
+
+        <button class="action danger" onclick="deleteImages()">
+          Apagar todas as imagens
+        </button>
       </div>
-    </div>
+    `;
+  }
+}
 
-    <!-- MENSAGENS -->
-    <div class="section" id="messages">
+show("home");
 
-      <!-- APAGAR MENSAGENS -->
-      <div class="card danger">
-        <h3>Apagar todas as mensagens</h3>
-        <p>
-          Remove permanentemente todas as mensagens do chat.
-        </p>
+async function deleteMessages() {
+  const password = document.getElementById("password").value;
+  if (!password) return;
 
-        <input type="password" id="password-messages" placeholder="Senha admin">
-        <button onclick="deleteMessages()">Apagar mensagens</button>
-      </div>
+  const res = await fetch("/api/admin-delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
 
-      <!-- APAGAR IMAGENS -->
-      <div class="card danger">
-        <h3>Apagar imagens do storage</h3>
-        <p>
-          Remove todas as imagens armazenadas no bucket do Supabase.
-        </p>
+  const data = await res.json();
+  alert(res.ok ? "Mensagens apagadas." : data.error);
+}
 
-        <input type="password" id="password-images" placeholder="Senha admin">
-        <button onclick="deleteImages()">Apagar imagens</button>
-      </div>
+async function deleteImages() {
+  const password = document.getElementById("password").value;
+  if (!password) return;
 
-    </div>
+  const res = await fetch("/api/admin-delete-images", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
 
-  </main>
-
-  <script>
-    function showSection(section, el) {
-      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-
-      document.getElementById("home-header").style.display =
-        section === "home" ? "block" : "none";
-
-      document.getElementById(section).classList.add("active");
-      el.classList.add("active");
-    }
-
-    async function deleteMessages() {
-      const password = document.getElementById("password-messages").value;
-      if (!password) return;
-
-      if (!confirm("⚠️ Isso apagará TODAS as mensagens. Deseja continuar?")) return;
-
-      const res = await fetch("/api/admin-delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-password": password
-        },
-        body: JSON.stringify({ confirm: "DELETE_ALL" })
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("Mensagens apagadas com sucesso.");
-        document.getElementById("password-messages").value = "";
-      } else {
-        alert("Erro: " + (data.error || "Falha ao apagar mensagens."));
-      }
-    }
-
-    async function deleteImages() {
-      const password = document.getElementById("password-images").value;
-      if (!password) return;
-
-      if (!confirm("⚠️ Isso apagará TODAS as imagens do storage. Deseja continuar?")) return;
-
-      const res = await fetch("/api/admin-delete-images", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-password": password
-        },
-        body: JSON.stringify({ confirm: "DELETE_IMAGES" })
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert(`Imagens apagadas com sucesso (${data.deleted || 0}).`);
-        document.getElementById("password-images").value = "";
-      } else {
-        alert("Erro: " + (data.error || "Falha ao apagar imagens."));
-      }
-    }
-  </script>
+  const data = await res.json();
+  alert(res.ok
+    ? `Imagens apagadas: ${data.deleted}`
+    : data.error
+  );
+}
+</script>
 
 </body>
 </html>
