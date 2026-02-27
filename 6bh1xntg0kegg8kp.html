@@ -28,7 +28,7 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
 
-    /* ===== SIDEBAR ===== */
+    /* SIDEBAR */
     .sidebar {
       width: 220px;
       background: #161b22;
@@ -65,7 +65,7 @@
       color: #fff;
     }
 
-    /* ===== MAIN ===== */
+    /* MAIN */
     .main {
       flex: 1;
       padding: 30px;
@@ -137,7 +137,6 @@
       color: #fff;
       outline: none;
       font-size: 14px;
-      transition: border 0.2s ease;
     }
 
     input:focus {
@@ -160,42 +159,15 @@
       transform: translateY(-1px);
     }
 
-    /* ===== SCROLL ===== */
-    html {
-      scrollbar-width: thin;
-      scrollbar-color: #30363d #0d1117;
-    }
-
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #30363d;
-      border-radius: 6px;
-    }
-
-    /* ===== ANIMAÇÕES ===== */
+    /* ANIMAÇÕES */
     @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes fadeDown {
-      from {
-        opacity: 0;
-        transform: translateY(-8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -212,11 +184,11 @@
   <!-- MAIN -->
   <main class="main">
 
-    <!-- HEADER (APENAS INÍCIO) -->
+    <!-- HEADER (SÓ NO INÍCIO) -->
     <div id="home-header">
       <div class="title">Bem-vindo ao painel administrativo</div>
       <div class="subtitle">
-        Gerencie funções internas do sistema com cuidado.
+        Utilize este painel para gerenciar funções internas do sistema.
       </div>
     </div>
 
@@ -225,22 +197,36 @@
       <div class="card">
         <h3>Status do sistema</h3>
         <p>
-          Use o menu lateral para acessar as funcionalidades administrativas disponíveis.
+          Use o menu lateral para acessar as funções administrativas disponíveis.
         </p>
       </div>
     </div>
 
-    <!-- MESSAGES -->
+    <!-- MENSAGENS -->
     <div class="section" id="messages">
+
+      <!-- APAGAR MENSAGENS -->
       <div class="card danger">
         <h3>Apagar todas as mensagens</h3>
         <p>
-          Esta ação remove permanentemente todas as mensagens do sistema.
+          Remove permanentemente todas as mensagens do chat.
         </p>
 
-        <input type="password" id="password" placeholder="Senha admin">
+        <input type="password" id="password-messages" placeholder="Senha admin">
         <button onclick="deleteMessages()">Apagar mensagens</button>
       </div>
+
+      <!-- APAGAR IMAGENS -->
+      <div class="card danger">
+        <h3>Apagar imagens do storage</h3>
+        <p>
+          Remove todas as imagens armazenadas no bucket do Supabase.
+        </p>
+
+        <input type="password" id="password-images" placeholder="Senha admin">
+        <button onclick="deleteImages()">Apagar imagens</button>
+      </div>
+
     </div>
 
   </main>
@@ -258,10 +244,10 @@
     }
 
     async function deleteMessages() {
-      const password = document.getElementById("password").value;
+      const password = document.getElementById("password-messages").value;
       if (!password) return;
 
-      if (!confirm("⚠️ Esta ação é irreversível. Deseja continuar?")) return;
+      if (!confirm("⚠️ Isso apagará TODAS as mensagens. Deseja continuar?")) return;
 
       const res = await fetch("/api/admin-delete", {
         method: "POST",
@@ -276,9 +262,34 @@
 
       if (res.ok) {
         alert("Mensagens apagadas com sucesso.");
-        document.getElementById("password").value = "";
+        document.getElementById("password-messages").value = "";
       } else {
-        alert("Erro: " + (data.error || "Falha ao apagar."));
+        alert("Erro: " + (data.error || "Falha ao apagar mensagens."));
+      }
+    }
+
+    async function deleteImages() {
+      const password = document.getElementById("password-images").value;
+      if (!password) return;
+
+      if (!confirm("⚠️ Isso apagará TODAS as imagens do storage. Deseja continuar?")) return;
+
+      const res = await fetch("/api/admin-delete-images", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-password": password
+        },
+        body: JSON.stringify({ confirm: "DELETE_IMAGES" })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(`Imagens apagadas com sucesso (${data.deleted || 0}).`);
+        document.getElementById("password-images").value = "";
+      } else {
+        alert("Erro: " + (data.error || "Falha ao apagar imagens."));
       }
     }
   </script>
