@@ -28,7 +28,7 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
 
-    /* SIDEBAR */
+    /* ===== SIDEBAR ===== */
     .sidebar {
       width: 220px;
       background: #161b22;
@@ -52,6 +52,11 @@
       border: 1px solid #21262d;
       font-size: 14px;
       user-select: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .nav-item:hover {
+      transform: translateX(4px);
     }
 
     .nav-item.active {
@@ -60,30 +65,34 @@
       color: #fff;
     }
 
-    /* MAIN */
+    /* ===== MAIN ===== */
     .main {
       flex: 1;
       padding: 30px;
       display: flex;
       flex-direction: column;
       gap: 24px;
+      overflow-y: auto;
     }
 
     .title {
       font-size: 22px;
       font-weight: 600;
+      animation: fadeDown 0.4s ease;
     }
 
     .subtitle {
       font-size: 14px;
       color: #8b949e;
       margin-top: 6px;
+      animation: fadeDown 0.5s ease;
     }
 
     .section {
       display: none;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
+      animation: fadeUp 0.35s ease;
     }
 
     .section.active {
@@ -98,6 +107,12 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     .card h3 {
@@ -122,6 +137,7 @@
       color: #fff;
       outline: none;
       font-size: 14px;
+      transition: border 0.2s ease;
     }
 
     input:focus {
@@ -136,13 +152,15 @@
       color: #fff;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
     }
 
     button:hover {
       background: #f85149;
+      transform: translateY(-1px);
     }
 
-    /* Scroll */
+    /* ===== SCROLL ===== */
     html {
       scrollbar-width: thin;
       scrollbar-color: #30363d #0d1117;
@@ -156,6 +174,29 @@
       background: #30363d;
       border-radius: 6px;
     }
+
+    /* ===== ANIMAÇÕES ===== */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 
@@ -164,81 +205,63 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <h2>Admin</h2>
-    <div class="nav-item active" onclick="showSection('home')">🏠 Início</div>
-    <div class="nav-item" onclick="showSection('messages')">🗑️ Mensagens</div>
+    <div class="nav-item active" onclick="showSection('home', this)">🏠 Início</div>
+    <div class="nav-item" onclick="showSection('messages', this)">🗑️ Mensagens</div>
   </aside>
 
   <!-- MAIN -->
   <main class="main">
 
-    <!-- HOME -->
+    <!-- HEADER (APENAS INÍCIO) -->
     <div id="home-header">
       <div class="title">Bem-vindo ao painel administrativo</div>
       <div class="subtitle">
         Gerencie funções internas do sistema com cuidado.
-        Algumas ações são irreversíveis.
       </div>
     </div>
 
+    <!-- HOME -->
     <div class="section active" id="home">
       <div class="card">
         <h3>Status do sistema</h3>
         <p>
-          Este painel permite executar ações administrativas.
-          Use o menu lateral para acessar as funcionalidades disponíveis.
+          Use o menu lateral para acessar as funcionalidades administrativas disponíveis.
         </p>
       </div>
     </div>
 
     <!-- MESSAGES -->
-    <div id="messages-header" style="display:none">
-      <div class="title">Mensagens</div>
-      <div class="subtitle">
-        Gerenciamento de mensagens armazenadas no sistema.
-      </div>
-    </div>
-
     <div class="section" id="messages">
       <div class="card danger">
         <h3>Apagar todas as mensagens</h3>
         <p>
-          Esta ação remove permanentemente todas as mensagens.
-          Não é possível desfazer.
+          Esta ação remove permanentemente todas as mensagens do sistema.
         </p>
 
-        <input
-          type="password"
-          id="password"
-          placeholder="Senha admin"
-        >
-
-        <button onclick="deleteMessages()">
-          Apagar mensagens
-        </button>
+        <input type="password" id="password" placeholder="Senha admin">
+        <button onclick="deleteMessages()">Apagar mensagens</button>
       </div>
     </div>
 
   </main>
 
   <script>
-    function showSection(section) {
+    function showSection(section, el) {
       document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
       document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
 
-      document.getElementById("home-header").style.display = section === "home" ? "block" : "none";
-      document.getElementById("messages-header").style.display = section === "messages" ? "block" : "none";
+      document.getElementById("home-header").style.display =
+        section === "home" ? "block" : "none";
 
       document.getElementById(section).classList.add("active");
-      event.target.classList.add("active");
+      el.classList.add("active");
     }
 
     async function deleteMessages() {
       const password = document.getElementById("password").value;
       if (!password) return;
 
-      if (!confirm("⚠️ Esta ação é irreversível. Deseja continuar?")) {
-        return;
-      }
+      if (!confirm("⚠️ Esta ação é irreversível. Deseja continuar?")) return;
 
       const res = await fetch("/api/admin-delete", {
         method: "POST",
@@ -246,9 +269,7 @@
           "Content-Type": "application/json",
           "x-admin-password": password
         },
-        body: JSON.stringify({
-          confirm: "DELETE_ALL"
-        })
+        body: JSON.stringify({ confirm: "DELETE_ALL" })
       });
 
       const data = await res.json();
