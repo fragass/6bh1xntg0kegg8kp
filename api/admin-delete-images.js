@@ -11,46 +11,60 @@ export default async function handler(req, res) {
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const BUCKET = "images"; // 👈 nome exato do seu bucket
+  const BUCKET = "chat-images";
 
-  try {
-    // 1️⃣ Listar arquivos do bucket
-    const listRes = await fetch(
+  const headers = {
+    apikey: SERVICE_KEY,
+    Authorization: `Bearer ${SERVICE_KEY}`,
+    "Content-Type": "application/json"
+  };
+
+  // 🔁 função recursiva para listar tudo
+  async function listAll(prefix = "") {
+    const res = await fetch(
       `${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`,
       {
         method: "POST",
-        headers: {
-          apikey: SERVICE_KEY,
-          Authorization: `Bearer ${SERVICE_KEY}`,
-          "Content-Type": "application/json"
-        },
+        headers,
         body: JSON.stringify({
-          prefix: "",
+          prefix,
           limit: 1000
         })
       }
     );
 
-    const files = await listRes.json();
+    const items = await res.json();
+    let files = [];
 
-    if (!Array.isArray(files) || files.length === 0) {
+    for (const item of items) {
+      if (item.metadata) {
+        // é arquivo
+        files.push(prefix + item.name);
+      } else {
+        // é pasta → entra nela
+        const subFiles = await listAll(prefix + item.name + "/");
+        files = files.concat(subFiles);
+      }
+    }
+
+    return files;
+  }
+
+  try {
+    const allFiles = await listAll();
+
+    if (allFiles.length === 0) {
       return res.status(200).json({ success: true, deleted: 0 });
     }
 
-    // 2️⃣ Extrair caminhos
-    const prefixes = files.map(file => file.name);
-
-    // 3️⃣ Deletar arquivos
     const deleteRes = await fetch(
       `${SUPABASE_URL}/storage/v1/object/${BUCKET}`,
       {
         method: "DELETE",
-        headers: {
-          apikey: SERVICE_KEY,
-          Authorization: `Bearer ${SERVICE_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ prefixes })
+        headers,
+        body: JSON.stringify({
+          prefixes: allFiles
+        })
       }
     );
 
@@ -61,7 +75,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      deleted: prefixes.length
+      deleted: allFiles.length
     });
 
   } catch (err) {
