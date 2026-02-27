@@ -11,7 +11,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - Workday</title>
+  <title>Página inicial - Workday</title>
 
   <style>
     * {
@@ -28,7 +28,7 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
 
-    /* ===== SIDEBAR ===== */
+    /* SIDEBAR */
     .sidebar {
       width: 220px;
       background: #161b22;
@@ -51,6 +51,7 @@
       background: #0d1117;
       border: 1px solid #21262d;
       font-size: 14px;
+      user-select: none;
     }
 
     .nav-item.active {
@@ -59,7 +60,7 @@
       color: #fff;
     }
 
-    /* ===== MAIN ===== */
+    /* MAIN */
     .main {
       flex: 1;
       padding: 30px;
@@ -68,15 +69,25 @@
       gap: 24px;
     }
 
-    .header {
+    .title {
       font-size: 22px;
       font-weight: 600;
     }
 
+    .subtitle {
+      font-size: 14px;
+      color: #8b949e;
+      margin-top: 6px;
+    }
+
     .section {
-      display: grid;
+      display: none;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
+    }
+
+    .section.active {
+      display: grid;
     }
 
     .card {
@@ -91,6 +102,9 @@
 
     .card h3 {
       font-size: 16px;
+    }
+
+    .danger h3 {
       color: #f85149;
     }
 
@@ -122,7 +136,6 @@
       color: #fff;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s ease;
     }
 
     button:hover {
@@ -150,25 +163,47 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h2>Admin Panel</h2>
-    <div class="nav-item active">🗑️ Mensagens</div>
-    <!-- futuras funções -->
-    <!-- <div class="nav-item">👤 Usuários</div> -->
-    <!-- <div class="nav-item">⚙️ Configurações</div> -->
+    <h2>Admin</h2>
+    <div class="nav-item active" onclick="showSection('home')">🏠 Início</div>
+    <div class="nav-item" onclick="showSection('messages')">🗑️ Mensagens</div>
   </aside>
 
   <!-- MAIN -->
   <main class="main">
-    <div class="header">Painel Administrativo</div>
 
-    <div class="section">
+    <!-- HOME -->
+    <div id="home-header">
+      <div class="title">Bem-vindo ao painel administrativo</div>
+      <div class="subtitle">
+        Gerencie funções internas do sistema com cuidado.
+        Algumas ações são irreversíveis.
+      </div>
+    </div>
 
-      <!-- CARD: DELETE -->
+    <div class="section active" id="home">
       <div class="card">
+        <h3>Status do sistema</h3>
+        <p>
+          Este painel permite executar ações administrativas.
+          Use o menu lateral para acessar as funcionalidades disponíveis.
+        </p>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div id="messages-header" style="display:none">
+      <div class="title">Mensagens</div>
+      <div class="subtitle">
+        Gerenciamento de mensagens armazenadas no sistema.
+      </div>
+    </div>
+
+    <div class="section" id="messages">
+      <div class="card danger">
         <h3>Apagar todas as mensagens</h3>
         <p>
-          Esta ação remove permanentemente todas as mensagens do sistema.
-          Use apenas se tiver certeza absoluta do que está fazendo.
+          Esta ação remove permanentemente todas as mensagens.
+          Não é possível desfazer.
         </p>
 
         <input
@@ -181,11 +216,22 @@
           Apagar mensagens
         </button>
       </div>
-
     </div>
+
   </main>
 
   <script>
+    function showSection(section) {
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+
+      document.getElementById("home-header").style.display = section === "home" ? "block" : "none";
+      document.getElementById("messages-header").style.display = section === "messages" ? "block" : "none";
+
+      document.getElementById(section).classList.add("active");
+      event.target.classList.add("active");
+    }
+
     async function deleteMessages() {
       const password = document.getElementById("password").value;
       if (!password) return;
