@@ -94,39 +94,24 @@ h2 { margin-top:0; margin-bottom:20px; color:#fff; font-size:24px; }
   padding: 16px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 8px;
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  width: 180px;
-  height: 180px;
-  min-width: 180px;
+  width: 220px;
   min-height: 180px;
+  max-height: auto;
+  overflow: hidden;
 }
 
 /* Card de senha admin */
 .card.admin-password { border-color: var(--danger); }
 
 /* Card logs maior */
-.card.logs { height: 250px; overflow:auto; }
+.card.logs { width: 100%; max-width: 600px; height: 300px; overflow:auto; }
 
-/* Online */
-.online-count { font-size:42px; font-weight:700; color: var(--success); }
-.online-dot {
-  width:10px; height:10px; background:var(--success);
-  border-radius:50%; display:inline-block; margin-right:8px;
-}
-
-/* Logs */
-.log {
-  padding:8px;
-  border-radius:6px;
-  background: var(--panel-light);
-  border:1px solid var(--border);
-  margin-bottom:6px;
-  width:100%;
-}
-.log strong { color: var(--primary); }
+/* Card usuários online maior */
+.card.online { width: 250px; min-height: 200px; }
 
 /* Inputs */
 input {
@@ -213,10 +198,10 @@ function show(section){
     c.innerHTML=`
       <h2>Bem vindo!</h2>
       <div class="cards-grid">
-        <div class="card">
+        <div class="card online">
           <div><span class="online-dot"></span><strong>Usuários online</strong></div>
           <div class="online-count" id="onlineCount">0</div>
-          <div id="onlineList">Carregando...</div>
+          <div id="onlineList" style="word-break:break-word;">Carregando...</div>
         </div>
       </div>`;
     loadOnline();
@@ -251,7 +236,7 @@ function show(section){
         <div class="card admin-password">
           <input type="password" id="adminPassword" placeholder="Senha admin">
         </div>
-        <div class="card">
+        <div class="card" style="overflow:auto;">
           <strong>Adicionar usuário</strong>
           <input type="text" id="newUsername" placeholder="Username">
           <input type="text" id="newUserPassword" placeholder="Senha">
@@ -262,10 +247,10 @@ function show(section){
           <input type="text" id="removeUsername" placeholder="Username">
           <button class="action danger" onclick="removeUser()">Remover</button>
         </div>
-        <div class="card">
+        <div class="card" style="overflow:auto;">
           <strong>Ver usuários</strong>
           <button class="action" onclick="viewUsers()">Ver usuários</button>
-          <div id="userList" style="margin-top:10px;"></div>
+          <div id="userList" style="margin-top:10px; max-height:120px; overflow:auto;"></div>
         </div>
       </div>`;
   }
