@@ -10,9 +10,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // 🔐 validação simples de admin
-  const auth = req.headers.authorization;
-  if (!auth || auth !== `Bearer ${process.env.ADMIN_TOKEN}`) {
+  // 🔐 validação de admin (ROBUSTA)
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(403).json({ error: "Token não enviado" });
+  }
+
+  const [type, token] = authHeader.split(" ");
+
+  if (type !== "Bearer" || token !== process.env.ADMIN_TOKEN) {
     return res.status(403).json({ error: "Não autorizado" });
   }
 
@@ -20,10 +27,11 @@ export default async function handler(req, res) {
     .from("messages")
     .select("id, name, content, created_at, to")
     .order("created_at", { ascending: false })
-    .limit(500); // evita bomba
+    .limit(500);
 
   if (error) {
-    return res.status(500).json({ error: error.message });
+    console.error("Supabase error:", error);
+    return res.status(500).json({ error: "Erro ao buscar logs" });
   }
 
   return res.status(200).json(data);
