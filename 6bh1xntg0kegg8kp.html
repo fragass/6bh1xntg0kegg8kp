@@ -57,6 +57,7 @@ body {
 .main {
   flex: 1;
   padding: 40px;
+  overflow-y: auto;
   animation: fadeSlide .4s ease;
 }
 
@@ -70,6 +71,29 @@ body {
   flex-direction: column;
   gap: 12px;
   animation: scaleIn .25s ease;
+}
+
+.logs-card {
+  max-width: 100%;
+}
+
+.log {
+  padding: 10px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #0d1117;
+  font-size: 14px;
+}
+
+.log strong {
+  color: #58a6ff;
+}
+
+.log time {
+  font-size: 12px;
+  color: #9da7b3;
+  display: block;
+  margin-bottom: 4px;
 }
 
 input {
@@ -160,13 +184,14 @@ button.action:hover {
 <div class="sidebar">
   <button onclick="show('home')">Início</button>
   <button onclick="show('messages')">Mensagens</button>
+  <button onclick="show('logs')">Logs</button>
 </div>
 
 <div class="main" id="content"></div>
 
 <!-- Overlay -->
 <div class="overlay" id="overlay" onclick="hideOverlay()">
-  <div class="modal" id="modal">
+  <div class="modal" id="modal" onclick="event.stopPropagation()">
     <h3 id="modalTitle"></h3>
     <p id="modalMsg"></p>
   </div>
@@ -198,6 +223,18 @@ function show(section) {
       </div>
     `;
   }
+
+  if (section === "logs") {
+    c.innerHTML = `
+      <h2>Logs de mensagens</h2>
+
+      <div class="card logs-card">
+        <div id="logsContainer">Carregando logs...</div>
+      </div>
+    `;
+
+    loadLogs();
+  }
 }
 
 show("home");
@@ -212,7 +249,6 @@ function showOverlay(type, title, msg) {
   document.getElementById("modalMsg").innerText = msg;
 
   overlay.classList.add("show");
-
   setTimeout(hideOverlay, 3000);
 }
 
@@ -220,10 +256,65 @@ function hideOverlay() {
   document.getElementById("overlay").classList.remove("show");
 }
 
+/* ===== Logs ===== */
+async function loadLogs() {
+  const container = document.getElementById("logsContainer");
+
+  try {
+    const res = await fetch("/api/admin-logs", {
+      headers: {
+        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+      }
+    });
+
+    if (!res.ok) {
+      container.innerHTML = "Erro ao carregar logs.";
+      return;
+    }
+
+    const logs = await res.json();
+
+    if (!logs.length) {
+      container.innerHTML = "Nenhuma mensagem registrada.";
+      return;
+    }
+
+    container.innerHTML = "";
+
+    logs.forEach(msg => {
+      const date = new Date(msg.created_at);
+
+      container.innerHTML += `
+        <div class="log">
+          <strong>${escapeHtml(msg.name)}</strong>
+          ${msg.to ? `<span style="color:#d29922"> (sussurro → ${escapeHtml(msg.to)})</span>` : ""}
+          <time>
+            ${date.toLocaleDateString("pt-BR")} • ${date.toLocaleTimeString("pt-BR")}
+          </time>
+          <div>${escapeHtml(msg.content)}</div>
+        </div>
+      `;
+    });
+
+  } catch {
+    container.innerHTML = "Falha de conexão com o servidor.";
+  }
+}
+
+/* ===== Utils ===== */
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text ?? "";
+  return div.innerHTML;
+}
+
 /* ===== Actions ===== */
 async function deleteMessages() {
   const password = document.getElementById("password").value;
-  if (!password) return;
+  if (!password) {
+    showOverlay("warn", "Atenção", "Informe a senha admin.");
+    return;
+  }
 
   const res = await fetch("/api/admin-delete", {
     method: "POST",
@@ -242,7 +333,10 @@ async function deleteMessages() {
 
 async function deleteImages() {
   const password = document.getElementById("password").value;
-  if (!password) return;
+  if (!password) {
+    showOverlay("warn", "Atenção", "Informe a senha admin.");
+    return;
+  }
 
   const res = await fetch("/api/admin-delete-images", {
     method: "POST",
