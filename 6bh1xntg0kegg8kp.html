@@ -159,6 +159,7 @@ button.action {
 <div class="sidebar">
   <button onclick="show('home')">Início</button>
   <button onclick="show('messages')">Mensagens</button>
+  <button onclick="show('users')">Usuários</button>
   <button onclick="show('logs')">Logs</button>
   <button class="logout" onclick="logout()">Sair</button>
 </div>
@@ -227,9 +228,29 @@ function show(section) {
     `;
     loadLogs();
   }
+
+  if (section === "users") {
+    c.innerHTML = `
+      <h2>Gerenciar Usuários</h2>
+      <div class="card">
+        <input type="password" id="adminPassword" placeholder="Senha admin">
+
+        <strong>Adicionar usuário</strong>
+        <input type="text" id="newUsername" placeholder="Username">
+        <input type="text" id="newUserPassword" placeholder="Senha">
+        <button class="action" onclick="addUser()">Adicionar</button>
+
+        <hr style="border:1px solid #30363d; width:100%;">
+
+        <strong>Remover usuário</strong>
+        <input type="text" id="removeUsername" placeholder="Username">
+        <button class="action danger" onclick="removeUser()">Remover</button>
+      </div>
+    `;
+  }
 }
 
-/* ===== Overlay helpers ===== */
+/* ===== Overlay ===== */
 function showOverlay(type, title, message) {
   const overlay = document.getElementById("overlay");
   const modal = document.getElementById("modal");
@@ -239,11 +260,7 @@ function showOverlay(type, title, message) {
   document.getElementById("modalMessage").innerText = message;
 
   overlay.classList.add("show");
-  setTimeout(hideOverlay, 2500);
-}
-
-function hideOverlay() {
-  document.getElementById("overlay").classList.remove("show");
+  setTimeout(() => overlay.classList.remove("show"), 2500);
 }
 
 /* ===== Online ===== */
@@ -289,39 +306,68 @@ async function loadLogs() {
   }
 }
 
-/* ===== Actions ===== */
+/* ===== Admin Messages ===== */
 async function deleteMessages() {
   const password = document.getElementById("password").value;
-  try {
-    const res = await fetch("/api/admin-delete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password })
-    });
-    res.ok
-      ? showOverlay("success","Sucesso","Mensagens apagadas.")
-      : showOverlay("error","Erro","Senha inválida.");
-  } catch {
-    showOverlay("error","Erro","Falha na requisição.");
-  }
+
+  const res = await fetch("/api/admin-delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
+
+  res.ok
+    ? showOverlay("success","Sucesso","Mensagens apagadas.")
+    : showOverlay("error","Erro","Senha inválida.");
 }
 
 async function deleteImages() {
   const password = document.getElementById("password").value;
-  try {
-    const res = await fetch("/api/admin-delete-images", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password })
-    });
-    res.ok
-      ? showOverlay("success","Sucesso","Imagens apagadas.")
-      : showOverlay("error","Erro","Senha inválida.");
-  } catch {
-    showOverlay("error","Erro","Falha na requisição.");
-  }
+
+  const res = await fetch("/api/admin-delete-images", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
+
+  res.ok
+    ? showOverlay("success","Sucesso","Imagens apagadas.")
+    : showOverlay("error","Erro","Senha inválida.");
 }
 
+/* ===== Gerenciar Usuários ===== */
+async function addUser() {
+  const username = document.getElementById("newUsername").value;
+  const password = document.getElementById("newUserPassword").value;
+  const adminPassword = document.getElementById("adminPassword").value;
+
+  const res = await fetch("/api/admin-add-user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password, adminPassword })
+  });
+
+  res.ok
+    ? showOverlay("success","Sucesso","Usuário criado.")
+    : showOverlay("error","Erro","Falha ao criar usuário.");
+}
+
+async function removeUser() {
+  const username = document.getElementById("removeUsername").value;
+  const adminPassword = document.getElementById("adminPassword").value;
+
+  const res = await fetch("/api/admin-remove-user", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, adminPassword })
+  });
+
+  res.ok
+    ? showOverlay("success","Sucesso","Usuário removido.")
+    : showOverlay("error","Erro","Falha ao remover usuário.");
+}
+
+/* ===== Logout ===== */
 function logout() {
   sessionStorage.removeItem("token");
   window.location.href = "index.html";
@@ -329,6 +375,6 @@ function logout() {
 
 show("home");
 </script>
-
 </body>
 </html>
+
