@@ -148,6 +148,34 @@ button.danger:hover { background: var(--danger-hover); }
 .modal.success { border-color: var(--success); }
 .modal.error { border-color: var(--danger); }
 .modal h3 { margin-top: 0; margin-bottom: 8px; }
+  /* ===== Scrollbar estilizada ===== */
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111; /* quase invisível */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8a2be2; /* roxo principal */
+  border-radius: 10px;
+  border: 2px solid #111; /* cria efeito de espaço interno */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a855f7; /* roxo mais vivo no hover */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #8a2be2 #111;
+}
 </style>
 </head>
 
@@ -338,6 +366,7 @@ show("home");
 
 </body>
 </html>
+
 
 
 
