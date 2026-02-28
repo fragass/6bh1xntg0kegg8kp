@@ -4,19 +4,18 @@
 <link rel="icon" href="favicon.png" type="image/png">
 
 <script>
-  if (!sessionStorage.getItem("token")) {
+  // 🔐 Proteção simples
+  if (!sessionStorage.getItem("adminToken")) {
     window.location.href = "index.html";
   }
 </script>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Página inicial - Workday</title>
+<title>Painel Admin - Workday</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -70,12 +69,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  animation: scaleIn .25s ease;
 }
 
-.logs-card {
-  max-width: 100%;
-}
+.logs-card { max-width: 100%; }
 
 .log {
   padding: 10px;
@@ -83,11 +79,10 @@ body {
   border-radius: 6px;
   background: #0d1117;
   font-size: 14px;
+  margin-bottom: 10px;
 }
 
-.log strong {
-  color: #58a6ff;
-}
+.log strong { color: #58a6ff; }
 
 .log time {
   font-size: 12px;
@@ -110,17 +105,9 @@ button.action {
   border: none;
   font-weight: 600;
   cursor: pointer;
-  transition: transform .15s, opacity .15s;
 }
 
-button.action:hover {
-  transform: translateY(-1px);
-  opacity: .9;
-}
-
-.danger {
-  background: #da3633;
-}
+.danger { background: #da3633; color: #fff; }
 
 /* ===== Overlay ===== */
 .overlay {
@@ -149,32 +136,15 @@ button.action:hover {
   border-radius: 12px;
   padding: 24px;
   text-align: center;
-  animation: scaleIn .25s ease;
 }
 
 .modal.success { border-color: #2ea043; }
-.modal.error   { border-color: #f85149; }
-.modal.warn    { border-color: #d29922; }
+.modal.error { border-color: #f85149; }
+.modal.warn { border-color: #d29922; }
 
-.modal h3 {
-  margin: 0 0 8px;
-}
-
-.modal p {
-  margin: 0;
-  font-size: 14px;
-  color: #9da7b3;
-}
-
-/* ===== Animations ===== */
 @keyframes fadeSlide {
   from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: none; }
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(.96); }
-  to   { opacity: 1; transform: scale(1); }
+  to { opacity: 1; transform: none; }
 }
 </style>
 </head>
@@ -183,13 +153,12 @@ button.action:hover {
 
 <div class="sidebar">
   <button onclick="show('home')">Início</button>
-  <button onclick="show('messages')">Mensagens</button>
+  <button onclick="show('actions')">Ações</button>
   <button onclick="show('logs')">Logs</button>
 </div>
 
 <div class="main" id="content"></div>
 
-<!-- Overlay -->
 <div class="overlay" id="overlay" onclick="hideOverlay()">
   <div class="modal" id="modal" onclick="event.stopPropagation()">
     <h3 id="modalTitle"></h3>
@@ -203,12 +172,12 @@ function show(section) {
 
   if (section === "home") {
     c.innerHTML = `
-      <h2>Bem-vindo ao painel admin</h2>
-      <p>Gerencie mensagens, imagens e funções internas do sistema.</p>
+      <h2>Painel Administrativo</h2>
+      <p>Gerencie mensagens e registros do sistema.</p>
     `;
   }
 
-  if (section === "messages") {
+  if (section === "actions") {
     c.innerHTML = `
       <div class="card">
         <input type="password" id="password" placeholder="Senha admin">
@@ -227,28 +196,24 @@ function show(section) {
   if (section === "logs") {
     c.innerHTML = `
       <h2>Logs de mensagens</h2>
-
       <div class="card logs-card">
         <div id="logsContainer">Carregando logs...</div>
       </div>
     `;
-
     loadLogs();
   }
 }
 
 show("home");
 
-/* ===== Overlay Control ===== */
+/* ===== Overlay ===== */
 function showOverlay(type, title, msg) {
-  const overlay = document.getElementById("overlay");
-  const modal = document.getElementById("modal");
-
-  modal.className = `modal ${type}`;
-  document.getElementById("modalTitle").innerText = title;
-  document.getElementById("modalMsg").innerText = msg;
-
-  overlay.classList.add("show");
+  const o = document.getElementById("overlay");
+  const m = document.getElementById("modal");
+  m.className = `modal ${type}`;
+  modalTitle.innerText = title;
+  modalMsg.innerText = msg;
+  o.classList.add("show");
   setTimeout(hideOverlay, 3000);
 }
 
@@ -263,58 +228,50 @@ async function loadLogs() {
   try {
     const res = await fetch("/api/admin-logs", {
       headers: {
-        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+        Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`
       }
     });
 
     if (!res.ok) {
-      container.innerHTML = "Erro ao carregar logs.";
+      container.innerText = "Não autorizado ou erro ao carregar logs.";
       return;
     }
 
     const logs = await res.json();
+    container.innerHTML = "";
 
     if (!logs.length) {
-      container.innerHTML = "Nenhuma mensagem registrada.";
+      container.innerText = "Nenhuma mensagem registrada.";
       return;
     }
 
-    container.innerHTML = "";
-
     logs.forEach(msg => {
-      const date = new Date(msg.created_at);
-
+      const d = new Date(msg.created_at);
       container.innerHTML += `
         <div class="log">
           <strong>${escapeHtml(msg.name)}</strong>
-          ${msg.to ? `<span style="color:#d29922"> (sussurro → ${escapeHtml(msg.to)})</span>` : ""}
-          <time>
-            ${date.toLocaleDateString("pt-BR")} • ${date.toLocaleTimeString("pt-BR")}
-          </time>
+          ${msg.to ? `<span style="color:#d29922"> (→ ${escapeHtml(msg.to)})</span>` : ""}
+          <time>${d.toLocaleString("pt-BR")}</time>
           <div>${escapeHtml(msg.content)}</div>
         </div>
       `;
     });
 
   } catch {
-    container.innerHTML = "Falha de conexão com o servidor.";
+    container.innerText = "Erro de conexão.";
   }
 }
 
 /* ===== Utils ===== */
 function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text ?? "";
-  return div.innerHTML;
+  const d = document.createElement("div");
+  d.textContent = text ?? "";
+  return d.innerHTML;
 }
 
 /* ===== Actions ===== */
 async function deleteMessages() {
   const password = document.getElementById("password").value;
-  if (!password) {
-    showOverlay("warn", "Atenção", "Informe a senha admin.");
-    return;
-  }
 
   const res = await fetch("/api/admin-delete", {
     method: "POST",
@@ -323,20 +280,13 @@ async function deleteMessages() {
   });
 
   const data = await res.json();
-
-  if (res.ok) {
-    showOverlay("success", "Concluído", "Mensagens apagadas com sucesso.");
-  } else {
-    showOverlay("error", "Erro", data.error || "Não autorizado.");
-  }
+  res.ok
+    ? showOverlay("success", "Concluído", "Mensagens apagadas.")
+    : showOverlay("error", "Erro", data.error || "Falha.");
 }
 
 async function deleteImages() {
   const password = document.getElementById("password").value;
-  if (!password) {
-    showOverlay("warn", "Atenção", "Informe a senha admin.");
-    return;
-  }
 
   const res = await fetch("/api/admin-delete-images", {
     method: "POST",
@@ -345,16 +295,9 @@ async function deleteImages() {
   });
 
   const data = await res.json();
-
-  if (res.ok) {
-    showOverlay(
-      "success",
-      "Imagens apagadas",
-      `${data.deleted} arquivos removidos do bucket.`
-    );
-  } else {
-    showOverlay("error", "Erro", data.error || "Falha ao apagar imagens.");
-  }
+  res.ok
+    ? showOverlay("success", "Concluído", `${data.deleted} imagens apagadas.`)
+    : showOverlay("error", "Erro", data.error || "Falha.");
 }
 </script>
 
