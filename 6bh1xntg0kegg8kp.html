@@ -373,7 +373,6 @@ async function loadOnline() {
 }
 
 /* ===== Logs ===== */
-/* ===== Logs ===== */
 async function loadLogs() {
   const container = document.getElementById("logsContainer");
 
@@ -381,23 +380,39 @@ async function loadLogs() {
     const res = await fetch("/api/admin-logs");
     const data = await res.json();
 
-    container.innerHTML = data.length ? "" : "Nenhum sussurro registrado.";
+    container.innerHTML = data.length ? "" : "Nenhuma mensagem registrada.";
 
     data.forEach(msg => {
 
-      // Ajuste aqui se seu backend usar outro nome de campo
-      const target = msg.to || msg.whisper_to || msg.target;
+      // Detecta destinatário de sussurro
+      const target = msg.to || msg.whisper_to || msg.target || null;
 
-      // Só exibe se for realmente sussurro
-      if (target) {
-        container.innerHTML += `
-          <div class="log">
-            <strong>${msg.name}</strong>
-            <span style="color: var(--muted)"> → </span>
-            <strong style="color: var(--success)">${target}</strong>
-          </div>
-        `;
+      // Formata data e horário (ajuste o campo se necessário)
+      const date = msg.created_at || msg.date || msg.timestamp;
+      let formattedDate = "";
+
+      if (date) {
+        const d = new Date(date);
+        formattedDate = d.toLocaleString("pt-BR");
       }
+
+      // Cabeçalho da mensagem
+      const header = target
+        ? `<strong>${msg.name}</strong>
+           <span style="color: var(--muted)"> → </span>
+           <strong style="color: var(--success)">${target}</strong>
+           <span style="color: var(--muted); font-size:12px;"> (sussurro)</span>`
+        : `<strong>${msg.name}</strong>`;
+
+      container.innerHTML += `
+        <div class="log">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div>${header}</div>
+            <div style="font-size:12px; color: var(--muted);">${formattedDate}</div>
+          </div>
+          <div>${msg.content}</div>
+        </div>
+      `;
     });
 
   } catch {
@@ -476,6 +491,7 @@ show("home");
 </script>
 </body>
 </html>
+
 
 
 
