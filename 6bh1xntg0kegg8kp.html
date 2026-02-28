@@ -22,6 +22,7 @@
   --primary: #58a6ff;
   --danger: #da3633;
   --yellow: #d29922;
+  --success: #2ea043;
 }
 
 * { box-sizing: border-box; }
@@ -61,7 +62,6 @@ body {
   transform: translateX(4px);
 }
 
-/* botão sair (danger, igual antes) */
 .sidebar .logout {
   background: var(--danger);
   border: none;
@@ -94,6 +94,34 @@ body {
 
 .logs-card { max-width: 100%; }
 
+/* ===== Online Card ===== */
+.online-card {
+  max-width: 420px;
+  margin-top: 20px;
+}
+
+.online-count {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.online-list {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.online-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* ===== Logs ===== */
 .log {
   padding: 12px;
   border: 1px solid var(--border);
@@ -126,12 +154,6 @@ button.action {
   border: none;
   font-weight: 600;
   cursor: pointer;
-  transition: transform .15s, opacity .15s;
-}
-
-button.action:hover {
-  transform: translateY(-1px);
-  opacity: .9;
 }
 
 .danger { background: var(--danger); }
@@ -147,7 +169,6 @@ button.action:hover {
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity .25s ease;
 }
 
 .overlay.show {
@@ -163,13 +184,6 @@ button.action:hover {
   padding: 24px;
   text-align: center;
 }
-
-.modal.success { border-color: #2ea043; }
-.modal.error   { border-color: #f85149; }
-.modal.warn    { border-color: var(--yellow); }
-
-.modal h3 { margin: 0 0 8px; }
-.modal p  { margin: 0; font-size: 14px; color: var(--muted); }
 
 /* ===== Animations ===== */
 @keyframes fadeIn {
@@ -195,13 +209,6 @@ button.action:hover {
 
 <div class="main" id="content"></div>
 
-<div class="overlay" id="overlay" onclick="hideOverlay()">
-  <div class="modal" id="modal" onclick="event.stopPropagation()">
-    <h3 id="modalTitle"></h3>
-    <p id="modalMsg"></p>
-  </div>
-</div>
-
 <script>
 function show(section) {
   const c = document.getElementById("content");
@@ -210,7 +217,17 @@ function show(section) {
     c.innerHTML = `
       <h2>Painel Admin</h2>
       <p>Gerencie mensagens, imagens e logs do sistema.</p>
+
+      <div class="card online-card">
+        <div>
+          <span class="online-dot"></span>
+          <strong>Usuários online</strong>
+        </div>
+        <div class="online-count" id="onlineCount">0</div>
+        <div class="online-list" id="onlineList">Carregando...</div>
+      </div>
     `;
+    loadOnline();
   }
 
   if (section === "messages") {
@@ -242,18 +259,30 @@ function show(section) {
 
 show("home");
 
-/* ===== Overlay ===== */
-function showOverlay(type, title, msg) {
-  const modal = document.getElementById("modal");
-  modal.className = `modal ${type}`;
-  document.getElementById("modalTitle").innerText = title;
-  document.getElementById("modalMsg").innerText = msg;
-  document.getElementById("overlay").classList.add("show");
-  setTimeout(hideOverlay, 3000);
-}
+/* ===== Online ===== */
+let onlineInterval;
 
-function hideOverlay() {
-  document.getElementById("overlay").classList.remove("show");
+async function loadOnline() {
+  clearInterval(onlineInterval);
+
+  async function fetchOnline() {
+    try {
+      const res = await fetch("/api/online");
+      const data = await res.json();
+
+      document.getElementById("onlineCount").innerText = data.length;
+      document.getElementById("onlineList").innerText =
+        data.length
+          ? data.map(u => u.name).join(", ")
+          : "Nenhum usuário online";
+    } catch {
+      document.getElementById("onlineCount").innerText = "0";
+      document.getElementById("onlineList").innerText = "Offline";
+    }
+  }
+
+  fetchOnline();
+  onlineInterval = setInterval(fetchOnline, 5000);
 }
 
 /* ===== Logs ===== */
@@ -264,12 +293,7 @@ async function loadLogs() {
     const res = await fetch("/api/admin-logs");
     const data = await res.json();
 
-    if (!res.ok) {
-      container.innerText = data.error || "Erro ao carregar logs.";
-      return;
-    }
-
-    if (!data.length) {
+    if (!res.ok || !data.length) {
       container.innerText = "Nenhuma mensagem registrada.";
       return;
     }
@@ -280,56 +304,36 @@ async function loadLogs() {
       const d = new Date(msg.created_at);
       container.innerHTML += `
         <div class="log">
-          <strong>${escapeHtml(msg.name)}</strong>
-          ${msg.to ? `<span style="color:var(--yellow)"> (sussurro → ${escapeHtml(msg.to)})</span>` : ""}
+          <strong>${msg.name}</strong>
+          ${msg.to ? `<span style="color:var(--yellow)"> (sussurro → ${msg.to})</span>` : ""}
           <time>${d.toLocaleString("pt-BR")}</time>
-          <div>${escapeHtml(msg.content)}</div>
+          <div>${msg.content}</div>
         </div>
       `;
     });
 
   } catch {
-    container.innerText = "Falha de conexão com o servidor.";
+    container.innerText = "Falha ao carregar logs.";
   }
-}
-
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text ?? "";
-  return div.innerHTML;
 }
 
 /* ===== Actions ===== */
 async function deleteMessages() {
   const password = document.getElementById("password").value;
-  if (!password) return showOverlay("warn", "Atenção", "Informe a senha.");
-
-  const res = await fetch("/api/admin-delete", {
+  await fetch("/api/admin-delete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ password })
   });
-
-  const data = await res.json();
-  res.ok
-    ? showOverlay("success", "OK", "Mensagens apagadas.")
-    : showOverlay("error", "Erro", data.error);
 }
 
 async function deleteImages() {
   const password = document.getElementById("password").value;
-  if (!password) return showOverlay("warn", "Atenção", "Informe a senha.");
-
-  const res = await fetch("/api/admin-delete-images", {
+  await fetch("/api/admin-delete-images", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ password })
   });
-
-  const data = await res.json();
-  res.ok
-    ? showOverlay("success", "OK", `${data.deleted} imagens apagadas.`)
-    : showOverlay("error", "Erro", data.error);
 }
 
 function logout() {
