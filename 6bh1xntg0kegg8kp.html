@@ -15,15 +15,15 @@
 
 <style>
 :root {
-  --bg: #0f172a;
-  --panel: #1e293b;
-  --panel-light: #273449;
-  --border: #334155;
-  --muted: #94a3b8;
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
+  --bg: #0a0a0f;
+  --panel: #1a1a2e;
+  --panel-light: #2c2c4a;
+  --border: #3a3a5a;
+  --muted: #a3a3c2;
+  --primary: #8a2be2;
+  --primary-hover: #7a1ed1;
+  --danger: #e02b6b;
+  --danger-hover: #c21f5a;
   --success: #22c55e;
 }
 
@@ -35,7 +35,7 @@ body {
   margin: 0;
   min-height: 100vh;
   display: flex;
-  background: linear-gradient(145deg, #0f172a, #0b1220);
+  background: linear-gradient(145deg, #0a0a0f, #0d0d1a);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   color: #f1f5f9;
   overflow: hidden;
@@ -112,6 +112,9 @@ h2 {
   box-shadow: 0 10px 25px rgba(0,0,0,.25);
   animation: fadeIn .25s ease;
   min-height: 180px;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
 }
 
 /* Cards de senha admin destacados em vermelho */
@@ -119,23 +122,26 @@ h2 {
   border: 2px solid var(--danger);
 }
 
-/* Ajuste inputs dentro dos cards */
+/* Inputs */
 .card input {
   padding: 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  background: #0f172a;
+  background: #0a0a0f;
   color: #fff;
   font-size: 14px;
   transition: all .2s ease;
+  text-align: center;
+  width: 80%;
 }
 
 .card input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(59,130,246,.25);
+  box-shadow: 0 0 0 2px rgba(138,43,226,.25);
 }
 
+/* Buttons */
 button.action {
   padding: 10px;
   border-radius: 8px;
@@ -145,6 +151,8 @@ button.action {
   background: var(--primary);
   color: white;
   transition: all .2s ease;
+  width: 80%;
+  margin: 0 auto;
 }
 
 button.action:hover {
@@ -161,7 +169,7 @@ button.danger:hover {
 
 /* ===== Online ===== */
 .online-count {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--success);
 }
@@ -182,8 +190,10 @@ button.danger:hover {
   background: var(--panel-light);
   border: 1px solid var(--border);
   margin-bottom: 6px;
-  max-height: 300px;
+  max-height: 250px;
   overflow-y: auto;
+  width: 100%;
+  text-align: left;
 }
 
 .log strong {
@@ -336,7 +346,7 @@ function show(section) {
   if (section === "logs") {
     c.innerHTML = `<h2>Logs de mensagens</h2>
     <div class="card-container">
-      <div class="card" style="min-height: 250px;">
+      <div class="card" style="min-height: 250px; justify-content:flex-start;">
         <div id="logsContainer" style="overflow-y:auto; max-height:200px;">Carregando logs...</div>
       </div>
     </div>`;
@@ -504,13 +514,13 @@ async function viewUsers() {
     container.innerHTML = users.length
       ? `<table style="width:100%; text-align:left; border-collapse: collapse;">
           <tr>
-            <th style="border-bottom:1px solid #334155; padding:6px;">Usuário</th>
-            <th style="border-bottom:1px solid #334155; padding:6px;">Senha</th>
+            <th style="border-bottom:1px solid #3a3a5a; padding:6px;">Usuário</th>
+            <th style="border-bottom:1px solid #3a3a5a; padding:6px;">Senha</th>
           </tr>
           ${users.map(u => `
             <tr>
-              <td style="border-bottom:1px solid #334155; padding:6px;">${u.username}</td>
-              <td style="border-bottom:1px solid #334155; padding:6px;">${u.password}</td>
+              <td style="border-bottom:1px solid #3a3a5a; padding:6px;">${u.username}</td>
+              <td style="border-bottom:1px solid #3a3a5a; padding:6px;">${u.password}</td>
             </tr>
           `).join("")}
         </table>`
