@@ -219,9 +219,14 @@ function hideOverlay() {
 /* ===== Logs ===== */
 async function loadLogs() {
   const container = document.getElementById("logsContainer");
+  const token = sessionStorage.getItem("token");
 
   try {
-    const res = await fetch("/api/admin-logs");
+    const res = await fetch("/api/admin-logs", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
 
     const data = await res.json();
 
