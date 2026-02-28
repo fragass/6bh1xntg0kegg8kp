@@ -62,7 +62,14 @@ body {
 .sidebar .logout:hover { background: var(--danger-hover); }
 
 /* Main */
-.main { flex:1; padding:50px; overflow-y:auto; display:flex; flex-direction:column; gap:30px; }
+.main { 
+  flex:1; 
+  padding:40px; 
+  overflow-y:auto; 
+  display:flex; 
+  flex-direction:column; 
+  gap:18px; /* menor gap para ficar menos esticado */
+}
 
 /* Headers */
 h2 { margin-top:0; font-size:24px; font-weight:600; margin-bottom:20px; color:#fff; }
@@ -72,17 +79,17 @@ h2 { margin-top:0; font-size:24px; font-weight:600; margin-bottom:20px; color:#f
   background: var(--panel);
   border:1px solid var(--border);
   border-radius:14px;
-  padding:28px;
+  padding:18px; /* padding menor */
   display:flex;
   flex-direction:column;
-  gap:14px;
-  box-shadow:0 10px 25px rgba(0,0,0,.25);
+  gap:10px; /* gap menor */
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
   animation: fadeIn .25s ease;
 }
 
 /* Inputs */
 input {
-  padding:12px;
+  padding:10px; /* menor padding */
   border-radius:8px;
   border:1px solid var(--border);
   background:#0f172a;
@@ -93,13 +100,13 @@ input {
 input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 2px rgba(59,130,246,.25); }
 
 /* Buttons */
-button.action { padding:12px; border-radius:8px; border:none; font-weight:600; cursor:pointer; background:var(--primary); color:white; transition:all .2s ease; }
+button.action { padding:10px; border-radius:8px; border:none; font-weight:600; cursor:pointer; background:var(--primary); color:white; transition:all .2s ease; }
 button.action:hover { background: var(--primary-hover); }
 button.danger { background:var(--danger); }
 button.danger:hover { background: var(--danger-hover); }
 
 /* Logs */
-.log { padding:14px; border-radius:10px; background: var(--panel-light); border:1px solid var(--border); margin-bottom:10px; }
+.log { padding:10px; border-radius:10px; background: var(--panel-light); border:1px solid var(--border); margin-bottom:10px; }
 .log strong { color: var(--primary); }
 
 /* Overlay */
@@ -146,7 +153,7 @@ function show(section){
     c.innerHTML=`<h2>Bem vindo!</h2>
     <div class="card">
       <strong>Usuários online</strong>
-      <div id="onlineCount" style="font-size:42px; font-weight:700; color:var(--success)">0</div>
+      <div id="onlineCount" style="font-size:36px; font-weight:700; color:var(--success)">0</div>
       <div id="onlineList">Carregando...</div>
     </div>`;
     loadOnline();
@@ -194,11 +201,12 @@ function show(section){
       <div class="card">
         <strong>Ver usuários</strong>
         <button class="action" onclick="viewUsers()">Ver usuários</button>
-        <div id="userList" style="margin-top:20px;"></div>
+        <div id="userList" style="margin-top:12px;"></div>
       </div>`;
   }
 }
 
+/* Overlay */
 function showOverlay(type,title,message){
   const overlay=document.getElementById("overlay");
   const modal=document.getElementById("modal");
@@ -209,7 +217,7 @@ function showOverlay(type,title,message){
   setTimeout(()=>overlay.classList.remove("show"),2500);
 }
 
-/* ===== Online ===== */
+/* Online */
 async function loadOnline(){
   async function fetchOnline(){
     const count=document.getElementById("onlineCount");
@@ -220,14 +228,12 @@ async function loadOnline(){
       const data=await res.json();
       count.innerText=data.length;
       list.innerText=data.length?data.map(u=>u.name).join(", "):"Nenhum usuário online";
-    }catch{
-      count.innerText="0"; list.innerText="Offline";
-    }
+    }catch{ count.innerText="0"; list.innerText="Offline"; }
   }
   fetchOnline(); onlineInterval=setInterval(fetchOnline,5000);
 }
 
-/* ===== Logs ===== */
+/* Logs */
 async function loadLogs(){
   const container=document.getElementById("logsContainer");
   try{
@@ -240,12 +246,12 @@ async function loadLogs(){
       let formattedDate="";
       if(date){ const d=new Date(date); formattedDate=d.toLocaleString("pt-BR"); }
       const header=target?`<strong>${msg.name}</strong><span style="color: var(--muted)"> → </span><strong style="color: var(--success)">${target}</strong><span style="color: var(--muted); font-size:12px;"> (sussurro)</span>`:`<strong>${msg.name}</strong>`;
-      container.innerHTML+=`<div class="log"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><div>${header}</div><div style="font-size:12px; color: var(--muted);">${formattedDate}</div></div><div>${msg.content}</div></div>`;
+      container.innerHTML+=`<div class="log"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"><div>${header}</div><div style="font-size:12px; color: var(--muted);">${formattedDate}</div></div><div>${msg.content}</div></div>`;
     });
   }catch{ container.innerText="Erro ao carregar logs."; }
 }
 
-/* ===== Admin Actions ===== */
+/* Admin Actions */
 async function deleteMessages(){
   const password=document.getElementById("password").value;
   const res=await fetch("/api/admin-delete",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});
