@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<link rel="icon" href="favicon.png" type="image/png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel Admin - Workday</title>
+<link rel="icon" href="favicon.png" type="image/png">
 
 <script>
   if (!sessionStorage.getItem("token")) {
@@ -26,14 +26,14 @@
   --success: #22c55e;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing:border-box; margin:0; padding:0; }
+
 body {
-  margin:0;
-  height:100vh;
   display:flex;
-  background: linear-gradient(145deg,#0f172a,#0b1220);
-  font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  min-height:100vh;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   color:#f1f5f9;
+  background: linear-gradient(145deg,#0f172a,#0b1220);
   overflow:hidden;
 }
 
@@ -42,82 +42,82 @@ body {
   width:240px;
   background:var(--panel);
   border-right:1px solid var(--border);
-  padding:30px 20px;
   display:flex;
   flex-direction:column;
+  padding:30px 20px;
   gap:12px;
 }
 .sidebar button {
-  padding:12px;
-  background:transparent;
+  padding:10px;
   border:1px solid var(--border);
+  background:transparent;
   color:#e2e8f0;
   border-radius:8px;
   cursor:pointer;
   font-weight:500;
-  transition:all .2s ease;
+  transition:.2s;
 }
 .sidebar button:hover { background: var(--panel-light); border-color: var(--primary); }
 .sidebar .logout { margin-top:auto; background:var(--danger); border:none; }
-.sidebar .logout:hover { background: var(--danger-hover); }
+.sidebar .logout:hover { background:var(--danger-hover); }
 
 /* Main */
-.main { 
-  flex:1; 
-  padding:40px; 
-  overflow-y:auto; 
-  display:flex; 
-  flex-direction:column; 
-  gap:18px; /* menor gap para ficar menos esticado */
+.main {
+  flex:1;
+  padding:30px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px; /* espaçamento entre cards */
+  overflow-y:auto;
 }
 
 /* Headers */
-h2 { margin-top:0; font-size:24px; font-weight:600; margin-bottom:20px; color:#fff; }
+h2 { width:100%; font-size:24px; font-weight:600; margin-bottom:16px; color:#fff; }
 
 /* Card */
 .card {
-  background: var(--panel);
+  background:var(--panel);
   border:1px solid var(--border);
   border-radius:14px;
-  padding:18px; /* padding menor */
+  padding:16px;
   display:flex;
   flex-direction:column;
-  gap:10px; /* gap menor */
+  gap:10px;
   box-shadow:0 6px 18px rgba(0,0,0,.25);
-  animation: fadeIn .25s ease;
+  width: 250px; /* largura fixa para grid */
 }
+.card.admin-password { border-color: var(--danger); }
 
 /* Inputs */
 input {
-  padding:10px; /* menor padding */
-  border-radius:8px;
+  padding:8px;
+  border-radius:6px;
   border:1px solid var(--border);
   background:#0f172a;
   color:#fff;
   font-size:14px;
-  transition: all .2s ease;
+  width:100%;
 }
 input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 2px rgba(59,130,246,.25); }
 
 /* Buttons */
-button.action { padding:10px; border-radius:8px; border:none; font-weight:600; cursor:pointer; background:var(--primary); color:white; transition:all .2s ease; }
+button.action { padding:8px; border-radius:6px; border:none; font-weight:600; cursor:pointer; background:var(--primary); color:white; transition:.2s; }
 button.action:hover { background: var(--primary-hover); }
 button.danger { background:var(--danger); }
 button.danger:hover { background: var(--danger-hover); }
 
 /* Logs */
-.log { padding:10px; border-radius:10px; background: var(--panel-light); border:1px solid var(--border); margin-bottom:10px; }
+.log { padding:8px; border-radius:10px; background: var(--panel-light); border:1px solid var(--border); margin-bottom:6px; }
 .log strong { color: var(--primary); }
 
 /* Overlay */
-.overlay { position:fixed; inset:0; background: rgba(15,23,42,.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s ease; }
+.overlay { position:fixed; inset:0; background: rgba(15,23,42,.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:.2s; }
 .overlay.show { opacity:1; pointer-events:auto; }
 .modal { width:340px; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:26px; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,.4); animation: scaleIn .2s ease; }
 .modal.success { border-color: var(--success); }
 .modal.error { border-color: var(--danger); }
 .modal h3 { margin-top:0; margin-bottom:8px; }
 
-@keyframes fadeIn { from { opacity:0; transform:translateY(5px);} to { opacity:1; transform:translateY(0);} }
 @keyframes scaleIn { from { transform:scale(.95); opacity:0;} to { transform:scale(1); opacity:1;} }
 </style>
 </head>
@@ -143,7 +143,7 @@ button.danger:hover { background: var(--danger-hover); }
 <script>
 let onlineInterval=null;
 
-function stopOnline(){ if(onlineInterval){ clearInterval(onlineInterval); onlineInterval=null;} }
+function stopOnline(){ if(onlineInterval){ clearInterval(onlineInterval); onlineInterval=null; } }
 
 function show(section){
   stopOnline();
@@ -173,7 +173,7 @@ function show(section){
 
   if(section==="logs"){
     c.innerHTML=`<h2>Logs de mensagens</h2>
-    <div class="card">
+    <div class="card" style="flex:1">
       <div id="logsContainer">Carregando logs...</div>
     </div>`;
     loadLogs();
@@ -181,8 +181,9 @@ function show(section){
 
   if(section==="users"){
     c.innerHTML=`<h2>Gerenciar Usuários</h2>
-      <div class="card">
-        <input type="password" id="adminPassword" placeholder="Senha admin">
+
+      <div class="card admin-password">
+        <input type="password" id="adminPassword" placeholder="Senha Admin">
       </div>
 
       <div class="card">
@@ -201,7 +202,7 @@ function show(section){
       <div class="card">
         <strong>Ver usuários</strong>
         <button class="action" onclick="viewUsers()">Ver usuários</button>
-        <div id="userList" style="margin-top:12px;"></div>
+        <div id="userList" style="margin-top:8px;"></div>
       </div>`;
   }
 }
@@ -230,7 +231,8 @@ async function loadOnline(){
       list.innerText=data.length?data.map(u=>u.name).join(", "):"Nenhum usuário online";
     }catch{ count.innerText="0"; list.innerText="Offline"; }
   }
-  fetchOnline(); onlineInterval=setInterval(fetchOnline,5000);
+  fetchOnline();
+  onlineInterval=setInterval(fetchOnline,5000);
 }
 
 /* Logs */
