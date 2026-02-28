@@ -330,6 +330,12 @@ function show(section) {
         <strong>Remover usuário</strong>
         <input type="text" id="removeUsername" placeholder="Username">
         <button class="action danger" onclick="removeUser()">Remover</button>
+
+        <hr style="border:1px solid #30363d; width:100%;">
+
+        <strong>Ver usuários</strong>
+        <button class="action" onclick="viewUsers()">Ver usuários</button>
+        <div id="userList" style="margin-top:20px;"></div>
       </div>
     `;
   }
@@ -383,11 +389,7 @@ async function loadLogs() {
     container.innerHTML = data.length ? "" : "Nenhuma mensagem registrada.";
 
     data.forEach(msg => {
-
-      // Detecta destinatário de sussurro
       const target = msg.to || msg.whisper_to || msg.target || null;
-
-      // Formata data e horário (ajuste o campo se necessário)
       const date = msg.created_at || msg.date || msg.timestamp;
       let formattedDate = "";
 
@@ -396,7 +398,6 @@ async function loadLogs() {
         formattedDate = d.toLocaleString("pt-BR");
       }
 
-      // Cabeçalho da mensagem
       const header = target
         ? `<strong>${msg.name}</strong>
            <span style="color: var(--muted)"> → </span>
@@ -481,6 +482,41 @@ async function removeUser() {
     : showOverlay("error","Erro","Falha ao remover usuário.");
 }
 
+/* ===== Ver Usuários ===== */
+async function viewUsers() {
+  const adminPassword = document.getElementById("adminPassword").value;
+
+  try {
+    const res = await fetch("/api/admin-users", {
+      headers: { "x-admin-token": adminPassword }
+    });
+
+    if (!res.ok) {
+      showOverlay("error", "Erro", "Senha inválida ou não autorizado");
+      return;
+    }
+
+    const users = await res.json();
+    const container = document.getElementById("userList");
+    container.innerHTML = users.length
+      ? `<table style="width:100%; text-align:left; border-collapse: collapse;">
+          <tr>
+            <th style="border-bottom:1px solid #334155; padding:6px;">Usuário</th>
+            <th style="border-bottom:1px solid #334155; padding:6px;">Senha</th>
+          </tr>
+          ${users.map(u => `
+            <tr>
+              <td style="border-bottom:1px solid #334155; padding:6px;">${u.username}</td>
+              <td style="border-bottom:1px solid #334155; padding:6px;">${u.password}</td>
+            </tr>
+          `).join("")}
+        </table>`
+      : "Nenhum usuário cadastrado";
+  } catch (err) {
+    showOverlay("error", "Erro", "Falha ao buscar usuários");
+  }
+}
+
 /* ===== Logout ===== */
 function logout() {
   sessionStorage.removeItem("token");
@@ -491,7 +527,3 @@ show("home");
 </script>
 </body>
 </html>
-
-
-
-
