@@ -7,7 +7,6 @@
   <title>Painel Admin - Workday</title>
 
   <script>
-    // Proteção: exige login em todo acesso
     if (!sessionStorage.getItem("token")) {
       window.location.href = "index.html";
     }
@@ -38,7 +37,6 @@
       overflow: hidden;
     }
 
-    /* ===== Sidebar ===== */
     .sidebar {
       width: 240px;
       background: var(--panel);
@@ -48,7 +46,6 @@
       flex-direction: column;
       gap: 10px;
     }
-
     .sidebar button {
       padding: 12px;
       background: transparent;
@@ -59,16 +56,13 @@
       font-weight: 500;
       transition: all .2s ease;
     }
-
     .sidebar button:hover { background: var(--panel-light); border-color: var(--primary); }
     .sidebar .logout { margin-top: auto; background: var(--danger); border: none; }
     .sidebar .logout:hover { background: var(--danger-hover); }
 
-    /* ===== Main ===== */
     .main { flex: 1; padding: 50px; overflow-y: auto; }
     h2 { margin-top:0; font-size:24px; font-weight:600; margin-bottom:20px; color:#fff; }
 
-    /* ===== Card ===== */
     .card {
       max-width: 480px;
       background: var(--panel);
@@ -81,17 +75,14 @@
       box-shadow: 0 10px 25px rgba(0,0,0,.25);
       animation: fadeIn .25s ease;
     }
-
     @keyframes fadeIn {
       from { opacity:0; transform:translateY(5px); }
       to { opacity:1; transform:translateY(0); }
     }
 
-    /* ===== Online ===== */
     .online-count { font-size:42px; font-weight:700; color: var(--success); }
     .online-dot { width:10px; height:10px; background:var(--success); border-radius:50%; display:inline-block; margin-right:8px; }
 
-    /* ===== Logs ===== */
     .log {
       padding:14px;
       border-radius:10px;
@@ -101,7 +92,6 @@
     }
     .log strong { color: var(--primary); }
 
-    /* ===== Inputs ===== */
     input {
       padding:12px;
       border-radius:8px;
@@ -113,7 +103,6 @@
     }
     input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 2px rgba(59,130,246,.25); }
 
-    /* ===== Buttons ===== */
     button.action {
       padding:12px;
       border-radius:8px;
@@ -130,7 +119,6 @@
 
     hr { border:none; border-top:1px solid var(--border); margin:10px 0; }
 
-    /* ===== Overlay ===== */
     .overlay {
       position: fixed;
       inset:0;
@@ -173,7 +161,6 @@
 
   <div class="main" id="content"></div>
 
-  <!-- Overlay -->
   <div class="overlay" id="overlay">
     <div class="modal" id="modal">
       <h3 id="modalTitle"></h3>
@@ -184,49 +171,40 @@
   <script>
     let onlineInterval = null;
 
-    function stopOnline() {
-      if (onlineInterval) { clearInterval(onlineInterval); onlineInterval=null; }
-    }
+    function stopOnline(){ if(onlineInterval){ clearInterval(onlineInterval); onlineInterval=null; } }
 
-    function show(section) {
+    function show(section){
       stopOnline();
-      const c = document.getElementById("content");
+      const c=document.getElementById("content");
 
       if(section==="home"){
-        c.innerHTML=`
-          <h2>Bem vindo!</h2>
+        c.innerHTML=`<h2>Bem vindo!</h2>
           <div class="card">
             <div><span class="online-dot"></span><strong>Usuários online</strong></div>
             <div class="online-count" id="onlineCount">0</div>
             <div id="onlineList">Carregando...</div>
-          </div>
-        `;
+          </div>`;
         loadOnline();
       }
 
       if(section==="messages"){
-        c.innerHTML=`
-          <div class="card">
-            <input type="password" id="password" placeholder="Senha admin">
-            <button class="action danger" onclick="deleteMessages()">Apagar todas as mensagens</button>
-            <button class="action danger" onclick="deleteImages()">Apagar todas as imagens</button>
-          </div>
-        `;
+        c.innerHTML=`<div class="card">
+          <input type="password" id="password" placeholder="Senha admin">
+          <button class="action danger" onclick="deleteMessages()">Apagar todas as mensagens</button>
+          <button class="action danger" onclick="deleteImages()">Apagar todas as imagens</button>
+        </div>`;
       }
 
       if(section==="logs"){
-        c.innerHTML=`
-          <h2>Logs de mensagens</h2>
+        c.innerHTML=`<h2>Logs de mensagens</h2>
           <div class="card">
             <div id="logsContainer">Carregando logs...</div>
-          </div>
-        `;
+          </div>`;
         loadLogs();
       }
 
       if(section==="users"){
-        c.innerHTML=`
-          <h2>Gerenciar Usuários</h2>
+        c.innerHTML=`<h2>Gerenciar Usuários</h2>
           <div class="card">
             <input type="password" id="adminPassword" placeholder="Senha admin">
 
@@ -246,14 +224,13 @@
             <strong>Ver usuários</strong>
             <button class="action" onclick="viewUsers()">Ver usuários</button>
             <div id="userList" style="margin-top:20px;"></div>
-          </div>
-        `;
+          </div>`;
       }
     }
 
-    function showOverlay(type, title, message){
-      const overlay = document.getElementById("overlay");
-      const modal = document.getElementById("modal");
+    function showOverlay(type,title,message){
+      const overlay=document.getElementById("overlay");
+      const modal=document.getElementById("modal");
       modal.className=`modal ${type}`;
       document.getElementById("modalTitle").innerText=title;
       document.getElementById("modalMessage").innerText=message;
@@ -266,7 +243,6 @@
         const count=document.getElementById("onlineCount");
         const list=document.getElementById("onlineList");
         if(!count||!list) return;
-
         try{
           const res=await fetch("/api/online");
           const data=await res.json();
@@ -315,14 +291,14 @@
       const password=document.getElementById("newUserPassword").value;
       const adminPassword=document.getElementById("adminPassword").value;
       const res=await fetch("/api/admin-add-user",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,password,adminPassword})});
-      res.ok?showOverlay("success","Sucesso","Usuário criado."):showOverlay("error","Erro","Falha ao criar usuário.");
+      res.ok?showOverlay("success","Sucesso","Usuário criado."):showOverlay("error","Erro","Senha inválida.");
     }
 
     async function removeUser(){
       const username=document.getElementById("removeUsername").value;
       const adminPassword=document.getElementById("adminPassword").value;
       const res=await fetch("/api/admin-remove-user",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,adminPassword})});
-      res.ok?showOverlay("success","Sucesso","Usuário removido."):showOverlay("error","Erro","Falha ao remover usuário.");
+      res.ok?showOverlay("success","Sucesso","Usuário removido."):showOverlay("error","Erro","Senha inválida.");
     }
 
     async function viewUsers(){
