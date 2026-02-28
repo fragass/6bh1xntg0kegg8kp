@@ -37,7 +37,6 @@ body {
   overflow: hidden;
 }
 
-/* ===== Sidebar ===== */
 .sidebar {
   width: 220px;
   background: var(--panel);
@@ -54,30 +53,21 @@ body {
   color: #e6edf3;
   border-radius: 6px;
   cursor: pointer;
-  transition: background .2s, transform .2s;
 }
 
 .sidebar button:hover {
   background: #21262d;
-  transform: translateX(4px);
 }
 
 .sidebar .logout {
   background: var(--danger);
   border: none;
-  font-weight: 600;
 }
 
-.sidebar .logout:hover {
-  background: #f85149;
-}
-
-/* ===== Main ===== */
 .main {
   flex: 1;
   padding: 40px;
   overflow-y: auto;
-  animation: fadeIn .3s ease;
 }
 
 .card {
@@ -89,16 +79,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  animation: scaleIn .25s ease;
 }
 
 .logs-card { max-width: 100%; }
-
-/* ===== Online Card ===== */
-.online-card {
-  max-width: 420px;
-  margin-top: 20px;
-}
 
 .online-count {
   font-size: 36px;
@@ -106,38 +89,21 @@ body {
   color: var(--success);
 }
 
-.online-list {
-  margin-top: 8px;
-  font-size: 14px;
-  color: var(--muted);
-}
-
 .online-dot {
-  display: inline-block;
   width: 8px;
   height: 8px;
   background: var(--success);
   border-radius: 50%;
+  display: inline-block;
   margin-right: 6px;
 }
 
-/* ===== Logs ===== */
 .log {
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--bg);
-  font-size: 14px;
   margin-bottom: 10px;
-}
-
-.log strong { color: var(--primary); }
-
-.log time {
-  font-size: 12px;
-  color: var(--muted);
-  display: block;
-  margin-bottom: 4px;
 }
 
 input {
@@ -157,44 +123,6 @@ button.action {
 }
 
 .danger { background: var(--danger); }
-
-/* ===== Overlay ===== */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.55);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.overlay.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal {
-  width: 320px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  text-align: center;
-}
-
-/* ===== Animations ===== */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(.96); }
-  to   { opacity: 1; transform: scale(1); }
-}
 </style>
 </head>
 
@@ -210,20 +138,29 @@ button.action {
 <div class="main" id="content"></div>
 
 <script>
+let onlineInterval = null;
+
+function stopOnline() {
+  if (onlineInterval) {
+    clearInterval(onlineInterval);
+    onlineInterval = null;
+  }
+}
+
 function show(section) {
+  stopOnline();
   const c = document.getElementById("content");
 
   if (section === "home") {
     c.innerHTML = `
       <h2>Bem vindo!</h2>
-
-      <div class="card online-card">
+      <div class="card">
         <div>
           <span class="online-dot"></span>
           <strong>Usuários online</strong>
         </div>
         <div class="online-count" id="onlineCount">0</div>
-        <div class="online-list" id="onlineList">Carregando...</div>
+        <div id="onlineList">Carregando...</div>
       </div>
     `;
     loadOnline();
@@ -256,27 +193,22 @@ function show(section) {
   }
 }
 
-show("home");
-
-/* ===== Online ===== */
-let onlineInterval;
-
 async function loadOnline() {
-  clearInterval(onlineInterval);
-
   async function fetchOnline() {
+    const count = document.getElementById("onlineCount");
+    const list = document.getElementById("onlineList");
+    if (!count || !list) return;
+
     try {
       const res = await fetch("/api/online");
       const data = await res.json();
-
-      document.getElementById("onlineCount").innerText = data.length;
-      document.getElementById("onlineList").innerText =
-        data.length
-          ? data.map(u => u.name).join(", ")
-          : "Nenhum usuário online";
+      count.innerText = data.length;
+      list.innerText = data.length
+        ? data.map(u => u.name).join(", ")
+        : "Nenhum usuário online";
     } catch {
-      document.getElementById("onlineCount").innerText = "0";
-      document.getElementById("onlineList").innerText = "Offline";
+      count.innerText = "0";
+      list.innerText = "Offline";
     }
   }
 
@@ -284,39 +216,24 @@ async function loadOnline() {
   onlineInterval = setInterval(fetchOnline, 5000);
 }
 
-/* ===== Logs ===== */
 async function loadLogs() {
   const container = document.getElementById("logsContainer");
-
   try {
     const res = await fetch("/api/admin-logs");
     const data = await res.json();
-
-    if (!res.ok || !data.length) {
-      container.innerText = "Nenhuma mensagem registrada.";
-      return;
-    }
-
-    container.innerHTML = "";
-
+    container.innerHTML = data.length ? "" : "Nenhuma mensagem registrada.";
     data.forEach(msg => {
-      const d = new Date(msg.created_at);
       container.innerHTML += `
         <div class="log">
           <strong>${msg.name}</strong>
-          ${msg.to ? `<span style="color:var(--yellow)"> (sussurro → ${msg.to})</span>` : ""}
-          <time>${d.toLocaleString("pt-BR")}</time>
           <div>${msg.content}</div>
-        </div>
-      `;
+        </div>`;
     });
-
   } catch {
-    container.innerText = "Falha ao carregar logs.";
+    container.innerText = "Erro ao carregar logs.";
   }
 }
 
-/* ===== Actions ===== */
 async function deleteMessages() {
   const password = document.getElementById("password").value;
   await fetch("/api/admin-delete", {
@@ -339,8 +256,9 @@ function logout() {
   sessionStorage.removeItem("token");
   window.location.href = "index.html";
 }
+
+show("home");
 </script>
 
 </body>
 </html>
-
