@@ -4,7 +4,7 @@
 <link rel="icon" href="favicon.png" type="image/png">
 
 <script>
-  // 🔐 proteção simples (igual antes)
+  // 🔐 proteção simples (frontend)
   if (!sessionStorage.getItem("token")) {
     window.location.href = "index.html";
   }
@@ -219,12 +219,11 @@ function hideOverlay() {
 /* ===== Logs ===== */
 async function loadLogs() {
   const container = document.getElementById("logsContainer");
-  const token = sessionStorage.getItem("token");
 
   try {
     const res = await fetch("/api/admin-logs", {
       headers: {
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`
       }
     });
 
