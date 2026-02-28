@@ -4,7 +4,7 @@
 <link rel="icon" href="favicon.png" type="image/png">
 
 <script>
-  // 🔐 Proteção simples
+  // 🔐 Proteção do painel admin
   if (!sessionStorage.getItem("adminToken")) {
     window.location.href = "index.html";
   }
@@ -79,7 +79,7 @@ body {
   border-radius: 6px;
   background: #0d1117;
   font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .log strong { color: #58a6ff; }
@@ -105,9 +105,15 @@ button.action {
   border: none;
   font-weight: 600;
   cursor: pointer;
+  transition: transform .15s, opacity .15s;
 }
 
-.danger { background: #da3633; color: #fff; }
+button.action:hover {
+  transform: translateY(-1px);
+  opacity: .9;
+}
+
+.danger { background: #da3633; }
 
 /* ===== Overlay ===== */
 .overlay {
@@ -139,12 +145,12 @@ button.action {
 }
 
 .modal.success { border-color: #2ea043; }
-.modal.error { border-color: #f85149; }
-.modal.warn { border-color: #d29922; }
+.modal.error   { border-color: #f85149; }
+.modal.warn    { border-color: #d29922; }
 
 @keyframes fadeSlide {
   from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
+  to   { opacity: 1; transform: none; }
 }
 </style>
 </head>
@@ -153,12 +159,14 @@ button.action {
 
 <div class="sidebar">
   <button onclick="show('home')">Início</button>
-  <button onclick="show('actions')">Ações</button>
+  <button onclick="show('messages')">Mensagens</button>
   <button onclick="show('logs')">Logs</button>
+  <button onclick="logout()">Sair</button>
 </div>
 
 <div class="main" id="content"></div>
 
+<!-- Overlay -->
 <div class="overlay" id="overlay" onclick="hideOverlay()">
   <div class="modal" id="modal" onclick="event.stopPropagation()">
     <h3 id="modalTitle"></h3>
@@ -172,12 +180,12 @@ function show(section) {
 
   if (section === "home") {
     c.innerHTML = `
-      <h2>Painel Administrativo</h2>
-      <p>Gerencie mensagens e registros do sistema.</p>
+      <h2>Painel Admin</h2>
+      <p>Gerencie mensagens, imagens e logs do sistema.</p>
     `;
   }
 
-  if (section === "actions") {
+  if (section === "messages") {
     c.innerHTML = `
       <div class="card">
         <input type="password" id="password" placeholder="Senha admin">
@@ -208,12 +216,14 @@ show("home");
 
 /* ===== Overlay ===== */
 function showOverlay(type, title, msg) {
-  const o = document.getElementById("overlay");
-  const m = document.getElementById("modal");
-  m.className = `modal ${type}`;
-  modalTitle.innerText = title;
-  modalMsg.innerText = msg;
-  o.classList.add("show");
+  const overlay = document.getElementById("overlay");
+  const modal = document.getElementById("modal");
+
+  modal.className = `modal ${type}`;
+  modal.querySelector("#modalTitle").innerText = title;
+  modal.querySelector("#modalMsg").innerText = msg;
+
+  overlay.classList.add("show");
   setTimeout(hideOverlay, 3000);
 }
 
@@ -224,28 +234,33 @@ function hideOverlay() {
 /* ===== Logs ===== */
 async function loadLogs() {
   const container = document.getElementById("logsContainer");
+  const token = sessionStorage.getItem("adminToken");
+
+  if (!token) {
+    container.innerText = "Token admin não encontrado.";
+    return;
+  }
 
   try {
     const res = await fetch("/api/admin-logs", {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     });
 
+    const data = await res.json();
+
     if (!res.ok) {
-      container.innerText = "Não autorizado ou erro ao carregar logs.";
+      container.innerText = data.error || "Erro ao carregar logs.";
       return;
     }
 
-    const logs = await res.json();
     container.innerHTML = "";
 
-    if (!logs.length) {
+    if (!data.length) {
       container.innerText = "Nenhuma mensagem registrada.";
       return;
     }
 
-    logs.forEach(msg => {
+    data.forEach(msg => {
       const d = new Date(msg.created_at);
       container.innerHTML += `
         <div class="log">
@@ -258,20 +273,21 @@ async function loadLogs() {
     });
 
   } catch {
-    container.innerText = "Erro de conexão.";
+    container.innerText = "Falha de conexão com o servidor.";
   }
 }
 
 /* ===== Utils ===== */
 function escapeHtml(text) {
-  const d = document.createElement("div");
-  d.textContent = text ?? "";
-  return d.innerHTML;
+  const div = document.createElement("div");
+  div.textContent = text ?? "";
+  return div.innerHTML;
 }
 
 /* ===== Actions ===== */
 async function deleteMessages() {
   const password = document.getElementById("password").value;
+  if (!password) return showOverlay("warn", "Atenção", "Informe a senha.");
 
   const res = await fetch("/api/admin-delete", {
     method: "POST",
@@ -281,12 +297,13 @@ async function deleteMessages() {
 
   const data = await res.json();
   res.ok
-    ? showOverlay("success", "Concluído", "Mensagens apagadas.")
-    : showOverlay("error", "Erro", data.error || "Falha.");
+    ? showOverlay("success", "OK", "Mensagens apagadas.")
+    : showOverlay("error", "Erro", data.error);
 }
 
 async function deleteImages() {
   const password = document.getElementById("password").value;
+  if (!password) return showOverlay("warn", "Atenção", "Informe a senha.");
 
   const res = await fetch("/api/admin-delete-images", {
     method: "POST",
@@ -296,8 +313,14 @@ async function deleteImages() {
 
   const data = await res.json();
   res.ok
-    ? showOverlay("success", "Concluído", `${data.deleted} imagens apagadas.`)
-    : showOverlay("error", "Erro", data.error || "Falha.");
+    ? showOverlay("success", "OK", `${data.deleted} imagens apagadas.`)
+    : showOverlay("error", "Erro", data.error);
+}
+
+/* ===== Logout ===== */
+function logout() {
+  sessionStorage.removeItem("adminToken");
+  window.location.href = "index.html";
 }
 </script>
 
