@@ -488,7 +488,9 @@ async function viewUsers() {
 
   try {
     const res = await fetch("/api/admin-users", {
-      headers: { "x-admin-token": adminPassword }
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ adminPassword })
     });
 
     if (!res.ok) {
@@ -527,3 +529,4 @@ show("home");
 </script>
 </body>
 </html>
+
