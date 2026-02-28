@@ -35,6 +35,7 @@
       color: #f1f5f9;
       overflow: hidden;
     }
+
     .sidebar {
       width: 240px;
       background: var(--panel);
@@ -42,7 +43,7 @@
       padding: 30px 20px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
     .sidebar button {
       padding: 12px;
@@ -59,26 +60,28 @@
     .sidebar .logout:hover { background: var(--danger-hover); }
 
     .main { flex: 1; padding: 50px; overflow-y: auto; }
-    h2 { margin-top:0; font-size:24px; font-weight:600; margin-bottom:20px; color:#fff; }
+
+    h2 { margin-top:0; font-size:24px; font-weight:600; margin-bottom:25px; color:#fff; }
 
     .card {
       max-width: 480px;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 28px;
+      padding: 30px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 20px; /* mais espaçamento interno */
       box-shadow: 0 10px 25px rgba(0,0,0,.25);
       animation: fadeIn .25s ease;
     }
+
     @keyframes fadeIn {
       from { opacity:0; transform:translateY(5px); }
       to { opacity:1; transform:translateY(0); }
     }
 
-    .online-count { font-size:42px; font-weight:700; color: var(--success); }
+    .online-count { font-size:42px; font-weight:700; color: var(--success); margin-top:10px; }
     .online-dot { width:10px; height:10px; background:var(--success); border-radius:50%; display:inline-block; margin-right:8px; }
 
     .log { padding:14px; border-radius:10px; background: var(--panel-light); border:1px solid var(--border); margin-bottom:10px; }
@@ -92,7 +95,7 @@
     button.danger { background:var(--danger); }
     button.danger:hover { background:var(--danger-hover); }
 
-    hr { border:none; border-top:1px solid var(--border); margin:10px 0; }
+    hr { border:none; border-top:1px solid var(--border); margin:20px 0; }
 
     .overlay { position: fixed; inset:0; background: rgba(15,23,42,.75); backdrop-filter: blur(6px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .2s ease; }
     .overlay.show { opacity:1; pointer-events:auto; }
@@ -102,6 +105,11 @@
     .modal.success { border-color: var(--success); }
     .modal.error { border-color: var(--danger); }
     .modal h3 { margin-top:0; margin-bottom:8px; }
+
+    /* ===== Seções dentro do card mais separadas ===== */
+    .section { display:flex; flex-direction:column; gap:12px; }
+    .section strong { margin-bottom:6px; font-size:16px; }
+    .section input, .section button { margin-bottom:6px; }
   </style>
 </head>
 
@@ -135,7 +143,7 @@ function show(section){
   if(section==="home"){
     c.innerHTML=`<h2>Bem vindo!</h2>
       <div class="card">
-        <div><span class="online-dot"></span><strong>Usuários online</strong></div>
+        <div class="section"><span class="online-dot"></span><strong>Usuários online</strong></div>
         <div class="online-count" id="onlineCount">0</div>
         <div id="onlineList">Carregando...</div>
       </div>`;
@@ -143,7 +151,7 @@ function show(section){
   }
 
   if(section==="messages"){
-    c.innerHTML=`<div class="card">
+    c.innerHTML=`<div class="card section">
       <input type="password" id="password" placeholder="Senha admin">
       <button class="action danger" onclick="deleteMessages()">Apagar todas as mensagens</button>
       <button class="action danger" onclick="deleteImages()">Apagar todas as imagens</button>
@@ -161,24 +169,32 @@ function show(section){
   if(section==="users"){
     c.innerHTML=`<h2>Gerenciar Usuários</h2>
       <div class="card">
-        <input type="password" id="adminPassword" placeholder="Senha admin">
+        <div class="section">
+          <input type="password" id="adminPassword" placeholder="Senha admin">
+        </div>
 
-        <strong>Adicionar usuário</strong>
-        <input type="text" id="newUsername" placeholder="Username">
-        <input type="text" id="newUserPassword" placeholder="Senha">
-        <button class="action" onclick="addUser()">Adicionar</button>
+        <div class="section">
+          <strong>Adicionar usuário</strong>
+          <input type="text" id="newUsername" placeholder="Username">
+          <input type="text" id="newUserPassword" placeholder="Senha">
+          <button class="action" onclick="addUser()">Adicionar</button>
+        </div>
 
-        <hr style="border:1px solid #30363d; width:100%;">
+        <hr>
 
-        <strong>Remover usuário</strong>
-        <input type="text" id="removeUsername" placeholder="Username">
-        <button class="action danger" onclick="removeUser()">Remover</button>
+        <div class="section">
+          <strong>Remover usuário</strong>
+          <input type="text" id="removeUsername" placeholder="Username">
+          <button class="action danger" onclick="removeUser()">Remover</button>
+        </div>
 
-        <hr style="border:1px solid #30363d; width:100%;">
+        <hr>
 
-        <strong>Ver usuários</strong>
-        <button class="action" onclick="viewUsers()">Ver usuários</button>
-        <div id="userList" style="margin-top:20px;"></div>
+        <div class="section">
+          <strong>Ver usuários</strong>
+          <button class="action" onclick="viewUsers()">Ver usuários</button>
+          <div id="userList" style="margin-top:20px;"></div>
+        </div>
       </div>`;
   }
 }
@@ -241,7 +257,6 @@ async function deleteImages(){
   res.ok?showOverlay("success","Sucesso","Imagens apagadas."):showOverlay("error","Erro","Senha inválida.");
 }
 
-// ===== Usuários =====
 async function addUser(){
   const username=document.getElementById("newUsername").value;
   const password=document.getElementById("newUserPassword").value;
