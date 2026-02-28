@@ -15,188 +15,132 @@
 <title>Painel Admin - Workday</title>
 
 <style>
-/* ===== Reset ===== */
-* {
-  box-sizing: border-box;
-}
-
 :root {
   --bg: #0d1117;
   --panel: #161b22;
-  --panel-2: #0f141c;
   --border: #21262d;
-  --text: #e6edf3;
   --muted: #9da7b3;
-  --blue: #58a6ff;
-  --red: #f85149;
-  --green: #2ea043;
+  --primary: #58a6ff;
+  --danger: #da3633;
   --yellow: #d29922;
 }
 
-/* ===== Base ===== */
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
   height: 100vh;
   display: flex;
-  background: radial-gradient(1200px 600px at 10% -10%, #111827 0%, var(--bg) 40%);
+  background: var(--bg);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  color: var(--text);
+  color: #e6edf3;
   overflow: hidden;
 }
 
 /* ===== Sidebar ===== */
 .sidebar {
-  width: 240px;
-  background: linear-gradient(180deg, #161b22, #0f141c);
+  width: 220px;
+  background: var(--panel);
   border-right: 1px solid var(--border);
-  padding: 28px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  animation: slideInLeft .4s ease;
+  padding: 24px;
 }
 
 .sidebar button {
-  padding: 12px 14px;
-  background: transparent;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: none;
   border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 10px;
+  color: #e6edf3;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
-  text-align: left;
-  transition: background .2s, transform .2s, border-color .2s;
+  transition: background .2s, transform .2s;
 }
 
 .sidebar button:hover {
-  background: #1f2630;
-  border-color: #30363d;
-  transform: translateX(6px);
-}
-
-.sidebar button:last-child {
-  margin-top: auto;
-  border-color: #3a1d1d;
-  color: #ffb4b4;
-}
-
-.sidebar button:last-child:hover {
-  background: #2a1515;
+  background: #21262d;
+  transform: translateX(4px);
 }
 
 /* ===== Main ===== */
 .main {
   flex: 1;
-  padding: 48px;
+  padding: 40px;
   overflow-y: auto;
-  animation: fadeUp .35s ease;
+  animation: fadeIn .3s ease;
 }
 
-.main h2 {
-  margin-top: 0;
-  font-weight: 600;
-  letter-spacing: .3px;
-}
+h2 { margin-top: 0; }
 
-.main p {
-  color: var(--muted);
-}
-
-/* ===== Cards ===== */
 .card {
-  background: linear-gradient(180deg, var(--panel), #11161d);
+  max-width: 420px;
+  background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  max-width: 460px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  gap: 12px;
   animation: scaleIn .25s ease;
 }
 
-.logs-card {
-  max-width: 100%;
-}
+.logs-card { max-width: 100%; }
 
-/* ===== Inputs ===== */
-input {
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--panel-2);
-  color: var(--text);
-  outline: none;
-  font-size: 14px;
-  transition: border-color .2s, box-shadow .2s;
-}
-
-input:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(88,166,255,.15);
-}
-
-/* ===== Buttons ===== */
-button.action {
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: transform .15s, opacity .15s, box-shadow .15s;
-}
-
-button.action:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-}
-
-button.action:active {
-  transform: scale(.98);
-}
-
-.danger {
-  background: linear-gradient(180deg, #ff6b6b, var(--red));
-  color: #fff;
-}
-
-/* ===== Logs ===== */
 .log {
-  padding: 14px;
+  padding: 12px;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: linear-gradient(180deg, #0f141c, #0b0f14);
+  border-radius: 8px;
+  background: var(--bg);
   font-size: 14px;
   margin-bottom: 10px;
-  animation: fadeUp .25s ease;
+  animation: fadeIn .25s ease;
 }
 
-.log strong {
-  color: var(--blue);
-}
+.log strong { color: var(--primary); }
 
 .log time {
   font-size: 12px;
   color: var(--muted);
   display: block;
-  margin: 4px 0 8px;
+  margin-bottom: 4px;
 }
+
+input {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background: var(--bg);
+  color: #fff;
+}
+
+button.action {
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s, opacity .15s;
+}
+
+button.action:hover {
+  transform: translateY(-1px);
+  opacity: .9;
+}
+
+.danger { background: var(--danger); }
 
 /* ===== Overlay ===== */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.6);
-  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity .25s ease;
-  z-index: 999;
 }
 
 .overlay.show {
@@ -205,45 +149,30 @@ button.action:active {
 }
 
 .modal {
-  width: 340px;
-  background: linear-gradient(180deg, var(--panel), #10151c);
+  width: 320px;
+  background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 26px;
+  border-radius: 12px;
+  padding: 24px;
   text-align: center;
-  animation: scaleIn .25s ease;
-  box-shadow: 0 20px 50px rgba(0,0,0,.45);
 }
 
-.modal h3 {
-  margin: 0 0 8px;
-  font-weight: 600;
-}
-
-.modal p {
-  margin: 0;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.modal.success { border-color: var(--green); }
-.modal.error   { border-color: var(--red); }
+.modal.success { border-color: #2ea043; }
+.modal.error   { border-color: #f85149; }
 .modal.warn    { border-color: var(--yellow); }
 
+.modal h3 { margin: 0 0 8px; }
+.modal p  { margin: 0; font-size: 14px; color: var(--muted); }
+
 /* ===== Animations ===== */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: none; }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(.96); }
   to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to   { opacity: 1; transform: none; }
 }
 </style>
 </head>
@@ -251,10 +180,10 @@ button.action:active {
 <body>
 
 <div class="sidebar">
-  <button onclick="show('home')">🏠 Início</button>
-  <button onclick="show('messages')">💬 Mensagens</button>
-  <button onclick="show('logs')">📜 Logs</button>
-  <button onclick="logout()">⏻ Sair</button>
+  <button onclick="show('home')">Início</button>
+  <button onclick="show('messages')">Mensagens</button>
+  <button onclick="show('logs')">Logs</button>
+  <button onclick="logout()">Sair</button>
 </div>
 
 <div class="main" id="content"></div>
@@ -268,8 +197,6 @@ button.action:active {
 </div>
 
 <script>
-/* ===== LOGICA ORIGINAL (INTACTA) ===== */
-
 function show(section) {
   const c = document.getElementById("content");
 
@@ -326,11 +253,86 @@ function hideOverlay() {
   document.getElementById("overlay").classList.remove("show");
 }
 
+/* ===== Logs ===== */
+async function loadLogs() {
+  const container = document.getElementById("logsContainer");
+
+  try {
+    const res = await fetch("/api/admin-logs");
+    const data = await res.json();
+
+    if (!res.ok) {
+      container.innerText = data.error || "Erro ao carregar logs.";
+      return;
+    }
+
+    if (!data.length) {
+      container.innerText = "Nenhuma mensagem registrada.";
+      return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(msg => {
+      const d = new Date(msg.created_at);
+
+      container.innerHTML += `
+        <div class="log">
+          <strong>${escapeHtml(msg.name)}</strong>
+          ${
+            msg.to
+              ? `<span style="color:var(--yellow)"> (sussurro → ${escapeHtml(msg.to)})</span>`
+              : ""
+          }
+          <time>${d.toLocaleString("pt-BR")}</time>
+          <div>${escapeHtml(msg.content)}</div>
+        </div>
+      `;
+    });
+
+  } catch {
+    container.innerText = "Falha de conexão com o servidor.";
+  }
+}
+
 /* ===== Utils ===== */
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text ?? "";
   return div.innerHTML;
+}
+
+/* ===== Actions ===== */
+async function deleteMessages() {
+  const password = document.getElementById("password").value;
+  if (!password) return showOverlay("warn", "Atenção", "Informe a senha.");
+
+  const res = await fetch("/api/admin-delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
+
+  const data = await res.json();
+  res.ok
+    ? showOverlay("success", "OK", "Mensagens apagadas.")
+    : showOverlay("error", "Erro", data.error);
+}
+
+async function deleteImages() {
+  const password = document.getElementById("password").value;
+  if (!password) return showOverlay("warn", "Atenção", "Informe a senha.");
+
+  const res = await fetch("/api/admin-delete-images", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
+
+  const data = await res.json();
+  res.ok
+    ? showOverlay("success", "OK", `${data.deleted} imagens apagadas.`)
+    : showOverlay("error", "Erro", data.error);
 }
 
 /* ===== Logout ===== */
