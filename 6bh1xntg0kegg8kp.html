@@ -21,7 +21,6 @@
   --muted: #9da7b3;
   --primary: #58a6ff;
   --danger: #da3633;
-  --yellow: #d29922;
   --success: #2ea043;
 }
 
@@ -55,10 +54,6 @@ body {
   cursor: pointer;
 }
 
-.sidebar button:hover {
-  background: #21262d;
-}
-
 .sidebar .logout {
   background: var(--danger);
   border: none;
@@ -80,8 +75,6 @@ body {
   flex-direction: column;
   gap: 12px;
 }
-
-.logs-card { max-width: 100%; }
 
 .online-count {
   font-size: 36px;
@@ -123,6 +116,41 @@ button.action {
 }
 
 .danger { background: var(--danger); }
+
+/* ===== Overlay ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+
+.overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal {
+  width: 320px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.modal.success { border-color: var(--success); }
+.modal.error { border-color: var(--danger); }
+
+.modal h3 {
+  margin-top: 0;
+}
 </style>
 </head>
 
@@ -136,6 +164,14 @@ button.action {
 </div>
 
 <div class="main" id="content"></div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalMessage"></p>
+  </div>
+</div>
 
 <script>
 let onlineInterval = null;
@@ -185,7 +221,7 @@ function show(section) {
   if (section === "logs") {
     c.innerHTML = `
       <h2>Logs de mensagens</h2>
-      <div class="card logs-card">
+      <div class="card">
         <div id="logsContainer">Carregando logs...</div>
       </div>
     `;
@@ -193,6 +229,24 @@ function show(section) {
   }
 }
 
+/* ===== Overlay helpers ===== */
+function showOverlay(type, title, message) {
+  const overlay = document.getElementById("overlay");
+  const modal = document.getElementById("modal");
+
+  modal.className = `modal ${type}`;
+  document.getElementById("modalTitle").innerText = title;
+  document.getElementById("modalMessage").innerText = message;
+
+  overlay.classList.add("show");
+  setTimeout(hideOverlay, 2500);
+}
+
+function hideOverlay() {
+  document.getElementById("overlay").classList.remove("show");
+}
+
+/* ===== Online ===== */
 async function loadOnline() {
   async function fetchOnline() {
     const count = document.getElementById("onlineCount");
@@ -216,6 +270,7 @@ async function loadOnline() {
   onlineInterval = setInterval(fetchOnline, 5000);
 }
 
+/* ===== Logs ===== */
 async function loadLogs() {
   const container = document.getElementById("logsContainer");
   try {
@@ -234,22 +289,37 @@ async function loadLogs() {
   }
 }
 
+/* ===== Actions ===== */
 async function deleteMessages() {
   const password = document.getElementById("password").value;
-  await fetch("/api/admin-delete", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  });
+  try {
+    const res = await fetch("/api/admin-delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password })
+    });
+    res.ok
+      ? showOverlay("success","Sucesso","Mensagens apagadas.")
+      : showOverlay("error","Erro","Senha inválida.");
+  } catch {
+    showOverlay("error","Erro","Falha na requisição.");
+  }
 }
 
 async function deleteImages() {
   const password = document.getElementById("password").value;
-  await fetch("/api/admin-delete-images", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  });
+  try {
+    const res = await fetch("/api/admin-delete-images", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password })
+    });
+    res.ok
+      ? showOverlay("success","Sucesso","Imagens apagadas.")
+      : showOverlay("error","Erro","Senha inválida.");
+  } catch {
+    showOverlay("error","Erro","Falha na requisição.");
+  }
 }
 
 function logout() {
