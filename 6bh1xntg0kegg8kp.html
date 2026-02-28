@@ -7,40 +7,38 @@
 <link rel="icon" href="favicon.png" type="image/png">
 
 <script>
-  if (!sessionStorage.getItem("token")) {
-    window.location.href = "index.html";
-  }
+if (!sessionStorage.getItem("token")) {
+  window.location.href = "index.html";
+}
 </script>
 
 <style>
 :root {
-  --bg: #0b0b0b;
-  --panel: #1a1a1a;
-  --panel-light: #222222;
-  --border: #333333;
+  --bg: #0a0a0a;
+  --panel: #1c1c1c;
+  --panel-light: #2a2a2a;
+  --border: #333;
+  --text: #eaeaea;
   --muted: #aaaaaa;
-  --primary: #8a2be2; /* roxo */
-  --primary-hover: #7a1cd9;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
+  --primary: #8a2be2;
+  --primary-hover: #7a1ed1;
+  --danger: #e02b6b;
+  --danger-hover: #c21f5a;
   --success: #22c55e;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-}
+* { box-sizing: border-box; }
 
 body {
+  margin: 0;
+  min-height: 100vh;
   display: flex;
-  height: 100vh;
   background: var(--bg);
-  color: #ffffff;
-  overflow: hidden;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--text);
 }
 
+/* Sidebar */
 .sidebar {
   width: 240px;
   background: var(--panel);
@@ -55,44 +53,27 @@ body {
   padding: 12px;
   background: transparent;
   border: 1px solid var(--border);
-  color: #ffffff;
+  color: var(--text);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   transition: all .2s ease;
 }
 
-.sidebar button:hover {
-  background: var(--panel-light);
-  border-color: var(--primary);
-}
+.sidebar button:hover { background: var(--panel-light); border-color: var(--primary); }
+.sidebar .logout { margin-top: auto; background: var(--danger); border: none; color: white; }
+.sidebar .logout:hover { background: var(--danger-hover); }
 
-.sidebar .logout {
-  margin-top: auto;
-  background: var(--danger);
-  border: none;
-}
+/* Main */
+.main { flex: 1; padding: 30px; overflow-y: auto; }
+h2 { margin-top: 0; font-size: 26px; font-weight: 600; margin-bottom: 20px; color: var(--text); }
 
-.sidebar .logout:hover {
-  background: var(--danger-hover);
-}
-
-.main {
-  flex: 1;
-  padding: 30px;
-  overflow-y: auto;
-}
-
-h2 {
-  margin-bottom: 20px;
-  color: #ffffff;
-}
-
-/* ===== Cards ===== */
-.cards-container {
-  display: flex;
-  flex-wrap: wrap;
+/* Card layout */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
+  margin-bottom: 30px;
 }
 
 .card {
@@ -103,80 +84,70 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 200px;
-  width: 250px;
-  box-shadow: 0 4px 15px rgba(0,0,0,.3);
-  transition: all .2s ease;
+  box-shadow: 0 8px 30px rgba(0,0,0,.6);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 150px;
 }
 
-.card.admin {
+/* ===== NOVO: admin card shadow roxo ===== */
+.card.admin { 
   border: 2px solid var(--danger);
-  box-shadow: 0 8px 25px rgba(138,43,226,.6);
+  box-shadow: 0 8px 30px rgba(138,43,226,0.6); /* mesmo roxo do input */
 }
 
+/* Inputs */
 .card input {
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid var(--primary);
-  background: #0b0b0b;
-  color: #ffffff;
+  border: 1px solid var(--border);
+  background: #0a0a0a;
+  color: var(--text);
   font-size: 14px;
   text-align: center;
+  width: 80%;
 }
 
-.card button {
+.card input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(138,43,226,.25);
+}
+
+/* Buttons */
+button.action {
   padding: 10px;
   border-radius: 8px;
-  border: none;
+  border: 1px solid var(--border);
   font-weight: 600;
   cursor: pointer;
-  background: var(--primary);
-  color: white;
+  background: #0a0a0a;
+  color: var(--text);
   transition: all .2s ease;
+  width: 80%;
+  margin-top: 10px;
 }
 
-button.danger {
-  background: var(--danger);
-}
+button.action:hover { background: var(--primary-hover); color: white; }
+button.danger { background: var(--danger); color: white; border: none; } /* reforçado */
+button.danger:hover { background: var(--danger-hover); }
 
-button.danger:hover {
-  background: var(--danger-hover);
-}
+/* Online */
+.online-count { font-size: 28px; font-weight: 700; color: var(--success); }
+.online-dot { width: 10px; height: 10px; background: var(--success); border-radius: 50%; display: inline-block; margin-right: 8px; }
 
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.75);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .2s ease;
-}
+/* Logs */
+.log { padding: 10px; border-radius: 10px; background: var(--panel-light); border: 1px solid var(--border); margin-bottom: 6px; width: 100%; text-align: left; }
+#logsContainer { width: 100%; max-height: 350px; overflow-y: auto; }
 
-.overlay.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal {
-  width: 340px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 26px;
-  text-align: center;
-  box-shadow: 0 15px 35px rgba(0,0,0,.4);
-}
-
+/* Overlay */
+.overlay { position: fixed; inset: 0; background: rgba(10,10,10,0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.overlay.show { opacity: 1; pointer-events: auto; }
+.modal { width: 340px; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 26px; text-align: center; box-shadow: 0 12px 35px rgba(0,0,0,.35); }
 .modal.success { border-color: var(--success); }
 .modal.error { border-color: var(--danger); }
-
-.online-count { font-size: 24px; font-weight: 700; color: var(--success); }
-
-.log strong.target { color: var(--primary); }
+.modal h3 { margin-top: 0; margin-bottom: 8px; }
 </style>
 </head>
 
@@ -192,6 +163,7 @@ button.danger:hover {
 
 <div class="main" id="content"></div>
 
+<!-- Overlay -->
 <div class="overlay" id="overlay">
   <div class="modal" id="modal">
     <h3 id="modalTitle"></h3>
@@ -202,78 +174,72 @@ button.danger:hover {
 <script>
 let onlineInterval = null;
 
-function stopOnline() {
-  if (onlineInterval) {
-    clearInterval(onlineInterval);
-    onlineInterval = null;
-  }
-}
+function stopOnline() { if(onlineInterval){clearInterval(onlineInterval); onlineInterval=null;} }
 
 function show(section) {
   stopOnline();
   const c = document.getElementById("content");
-  c.innerHTML = '';
 
-  if(section==='home'){
+  if(section==="home") {
     c.innerHTML = `<h2>Bem vindo!</h2>
-      <div class="cards-container">
-        <div class="card">
-          <div><strong>Usuários online</strong></div>
+      <div class="card-container">
+        <div class="card" style="min-height:180px; max-width:400px;">
+          <div><span class="online-dot"></span><strong>Usuários online</strong></div>
           <div class="online-count" id="onlineCount">0</div>
-          <div id="onlineList">Carregando...</div>
+          <div id="onlineList" style="overflow-wrap: break-word; margin-top:8px;">Carregando...</div>
         </div>
       </div>`;
     loadOnline();
   }
 
-  if(section==='messages'){
+  if(section==="messages") {
     c.innerHTML = `<h2>Mensagens</h2>
-    <div class="cards-container">
-      <div class="card admin">
-        <input type="password" id="password" placeholder="Senha admin">
-      </div>
-      <div class="card">
-        <button class="danger" onclick="deleteMessages()">Apagar mensagens</button>
-      </div>
-      <div class="card">
-        <button class="danger" onclick="deleteImages()">Apagar imagens</button>
-      </div>
-    </div>`;
+      <div class="card-container">
+        <div class="card admin">
+          <input type="password" id="password" placeholder="Senha admin">
+        </div>
+        <div class="card"><button class="action danger" onclick="deleteMessages()">Apagar todas as mensagens</button></div>
+        <div class="card"><button class="action danger" onclick="deleteImages()">Apagar todas as imagens</button></div>
+      </div>`;
   }
 
-  if(section==='users'){
-    c.innerHTML = `<h2>Usuários</h2>
-    <div class="cards-container">
-      <div class="card admin">
-        <input type="password" id="adminPassword" placeholder="Senha admin">
-      </div>
-      <div class="card">
-        <input type="text" id="newUsername" placeholder="Novo usuário">
-        <input type="text" id="newUserPassword" placeholder="Senha">
-        <button onclick="addUser()">Adicionar</button>
-      </div>
-      <div class="card">
-        <input type="text" id="removeUsername" placeholder="Usuário a remover">
-        <button class="danger" onclick="removeUser()">Remover</button>
-      </div>
-      <div class="card">
-        <button onclick="viewUsers()">Ver usuários</button>
-        <div id="userList" style="margin-top:10px;"></div>
-      </div>
-    </div>`;
+  if(section==="users") {
+    c.innerHTML = `<h2>Gerenciar Usuários</h2>
+      <div class="card-container">
+        <div class="card admin">
+          <input type="password" id="adminPassword" placeholder="Senha admin">
+        </div>
+        <div class="card">
+          <strong>Adicionar usuário</strong>
+          <input type="text" id="newUsername" placeholder="Username">
+          <input type="text" id="newUserPassword" placeholder="Senha">
+          <button class="action" onclick="addUser()">Adicionar</button>
+        </div>
+        <div class="card">
+          <strong>Remover usuário</strong>
+          <input type="text" id="removeUsername" placeholder="Username">
+          <button class="action danger" onclick="removeUser()">Remover</button>
+        </div>
+        <div class="card">
+          <strong>Ver usuários</strong>
+          <button class="action" onclick="viewUsers()">Ver usuários</button>
+          <div id="userList" style="margin-top:10px; overflow-y:auto; max-height:150px;"></div>
+        </div>
+      </div>`;
   }
 
-  if(section==='logs'){
+  if(section==="logs") {
     c.innerHTML = `<h2>Logs de mensagens</h2>
-    <div class="cards-container">
-      <div class="card" style="width:100%;">
-        <div id="logsContainer">Carregando logs...</div>
-      </div>
-    </div>`;
+      <div class="card-container">
+        <div class="card" style="min-height:300px; justify-content:flex-start; width:100%;">
+          <div id="logsContainer"></div>
+        </div>
+      </div>`;
     loadLogs();
   }
 }
 
+/* Overlay */
 function showOverlay(type,title,message){
   const overlay=document.getElementById("overlay");
   const modal=document.getElementById("modal");
@@ -284,11 +250,12 @@ function showOverlay(type,title,message){
   setTimeout(()=>overlay.classList.remove("show"),2500);
 }
 
+/* Online */
 async function loadOnline(){
   async function fetchOnline(){
     const count=document.getElementById("onlineCount");
     const list=document.getElementById("onlineList");
-    if(!count || !list) return;
+    if(!count||!list) return;
     try{
       const res=await fetch("/api/online");
       const data=await res.json();
@@ -303,6 +270,7 @@ async function loadOnline(){
   onlineInterval=setInterval(fetchOnline,5000);
 }
 
+/* Logs */
 async function loadLogs(){
   const container=document.getElementById("logsContainer");
   try{
@@ -313,15 +281,15 @@ async function loadLogs(){
       const target=msg.to||msg.whisper_to||msg.target||null;
       const date=msg.created_at||msg.date||msg.timestamp;
       let formattedDate="";
-      if(date){ formattedDate=new Date(date).toLocaleString("pt-BR"); }
-      const header=target
-        ? `<strong>${msg.name}</strong> <span style="color: var(--muted)">→</span> <strong class="target">${target}</strong> <span style="color: var(--muted); font-size:12px;"> (sussurro)</span>`
-        : `<strong>${msg.name}</strong>`;
-      container.innerHTML+=`<div class="log" style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;"><div>${header}</div><div style="font-size:12px;color:var(--muted);">${formattedDate}</div></div><div>${msg.content}</div></div>`;
+      if(date){const d=new Date(date); formattedDate=d.toLocaleString("pt-BR");}
+      // ===== alterado: target roxo =====
+      const header=target?`<strong>${msg.name}</strong> <span style="color: var(--muted)">→</span> <strong style="color: var(--primary)">${target}</strong> <span style="color: var(--muted); font-size:12px;"> (sussurro)</span>`:`<strong>${msg.name}</strong>`;
+      container.innerHTML+=`<div class="log"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><div>${header}</div><div style="font-size:12px; color: var(--muted);">${formattedDate}</div></div><div>${msg.content}</div></div>`;
     });
-  }catch{ container.innerText="Erro ao carregar logs."; }
+  }catch{container.innerText="Erro ao carregar logs.";}
 }
 
+/* Admin Messages */
 async function deleteMessages(){
   const password=document.getElementById("password").value;
   const res=await fetch("/api/admin-delete",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});
@@ -334,6 +302,7 @@ async function deleteImages(){
   res.ok?showOverlay("success","Sucesso","Imagens apagadas."):showOverlay("error","Erro","Senha inválida.");
 }
 
+/* Gerenciar Usuários */
 async function addUser(){
   const username=document.getElementById("newUsername").value;
   const password=document.getElementById("newUserPassword").value;
@@ -349,23 +318,23 @@ async function removeUser(){
   res.ok?showOverlay("success","Sucesso","Usuário removido."):showOverlay("error","Erro","Falha ao remover usuário.");
 }
 
+/* Ver Usuários */
 async function viewUsers(){
   const adminPassword=document.getElementById("adminPassword").value;
   try{
     const res=await fetch("/api/admin-users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({adminPassword})});
-    if(!res.ok){ showOverlay("error","Erro","Senha inválida ou não autorizado"); return; }
+    if(!res.ok){showOverlay("error","Erro","Senha inválida ou não autorizado"); return;}
     const users=await res.json();
     const container=document.getElementById("userList");
-    container.innerHTML=users.length?`<table style="width:100%;border-collapse:collapse;"><tr><th style="border-bottom:1px solid var(--border);padding:6px;">Usuário</th><th style="border-bottom:1px solid var(--border);padding:6px;">Senha</th></tr>${users.map(u=>`<tr><td style="border-bottom:1px solid var(--border);padding:6px;">${u.username}</td><td style="border-bottom:1px solid var(--border);padding:6px;">${u.password}</td></tr>`).join("")}</table>`:"Nenhum usuário cadastrado";
-  }catch{ showOverlay("error","Erro","Falha ao buscar usuários"); }
+    container.innerHTML=users.length?`<table style="width:100%; text-align:left; border-collapse: collapse;"><tr><th style="border-bottom:1px solid #333; padding:6px;">Usuário</th><th style="border-bottom:1px solid #333; padding:6px;">Senha</th></tr>${users.map(u=>`<tr><td style="border-bottom:1px solid #333; padding:6px;">${u.username}</td><td style="border-bottom:1px solid #333; padding:6px;">${u.password}</td></tr>`).join("")}</table>`:"Nenhum usuário cadastrado";
+  }catch{showOverlay("error","Erro","Falha ao buscar usuários");}
 }
 
-function logout(){
-  sessionStorage.removeItem("token");
-  window.location.href="index.html";
-}
+/* Logout */
+function logout(){ sessionStorage.removeItem("token"); window.location.href="index.html"; }
 
 show("home");
 </script>
+
 </body>
 </html>
