@@ -64,10 +64,10 @@ body {
 /* Main */
 .main {
   flex:1;
-  padding:30px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:20px; /* espaçamento entre cards */
+  padding:20px;
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap:16px; /* espaçamento entre os cards */
   overflow-y:auto;
 }
 
@@ -82,9 +82,11 @@ h2 { width:100%; font-size:24px; font-weight:600; margin-bottom:16px; color:#fff
   padding:16px;
   display:flex;
   flex-direction:column;
-  gap:10px;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
   box-shadow:0 6px 18px rgba(0,0,0,.25);
-  width: 250px; /* largura fixa para grid */
+  aspect-ratio:1 / 1; /* garante card quadrado */
 }
 .card.admin-password { border-color: var(--danger); }
 
@@ -101,7 +103,7 @@ input {
 input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 2px rgba(59,130,246,.25); }
 
 /* Buttons */
-button.action { padding:8px; border-radius:6px; border:none; font-weight:600; cursor:pointer; background:var(--primary); color:white; transition:.2s; }
+button.action { padding:8px; border-radius:6px; border:none; font-weight:600; cursor:pointer; background:var(--primary); color:white; transition:.2s; width:100%; }
 button.action:hover { background: var(--primary-hover); }
 button.danger { background:var(--danger); }
 button.danger:hover { background: var(--danger-hover); }
@@ -173,7 +175,7 @@ function show(section){
 
   if(section==="logs"){
     c.innerHTML=`<h2>Logs de mensagens</h2>
-    <div class="card" style="flex:1">
+    <div class="card" style="aspect-ratio: auto;">
       <div id="logsContainer">Carregando logs...</div>
     </div>`;
     loadLogs();
