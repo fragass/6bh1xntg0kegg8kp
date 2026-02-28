@@ -21,7 +21,7 @@
   --border: #333;
   --text: #eaeaea;
   --muted: #aaaaaa;
-  --primary: #8a2be2; /* hover e destaques */
+  --primary: #8a2be2;
   --primary-hover: #7a1ed1;
   --danger: #e02b6b;
   --danger-hover: #c21f5a;
@@ -111,7 +111,7 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,.3);
+  box-shadow: 0 8px 30px rgba(0,0,0,.6);
   animation: fadeIn .25s ease;
   justify-content: center;
   align-items: center;
@@ -162,6 +162,7 @@ button.action:hover {
   color: white;
 }
 
+/* Botões perigosos: apagar, remover, sair */
 button.danger {
   background: var(--danger);
   color: white;
@@ -266,7 +267,7 @@ button.danger:hover {
   <button onclick="show('messages')">Mensagens</button>
   <button onclick="show('users')">Usuários</button>
   <button onclick="show('logs')">Logs</button>
-  <button class="logout" onclick="logout()">Sair</button>
+  <button class="logout danger" onclick="logout()">Sair</button>
 </div>
 
 <div class="main" id="content"></div>
@@ -280,9 +281,8 @@ button.danger:hover {
 </div>
 
 <script>
-// Código JavaScript permanece igual ao anterior
+// JavaScript permanece igual, mantendo funções loadOnline, addUser, removeUser, deleteMessages, deleteImages, viewUsers, loadLogs, etc.
 let onlineInterval = null;
-
 function stopOnline() { if (onlineInterval) { clearInterval(onlineInterval); onlineInterval = null; } }
 
 function show(section) {
@@ -351,9 +351,6 @@ function show(section) {
     loadLogs();
   }
 }
-
-// Funções de overlay, online, logs, admin messages e usuários continuam iguais
-// ...
 
 show("home");
 </script>
