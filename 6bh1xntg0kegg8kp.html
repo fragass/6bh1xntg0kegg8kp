@@ -373,19 +373,33 @@ async function loadOnline() {
 }
 
 /* ===== Logs ===== */
+/* ===== Logs ===== */
 async function loadLogs() {
   const container = document.getElementById("logsContainer");
+
   try {
     const res = await fetch("/api/admin-logs");
     const data = await res.json();
-    container.innerHTML = data.length ? "" : "Nenhuma mensagem registrada.";
+
+    container.innerHTML = data.length ? "" : "Nenhum sussurro registrado.";
+
     data.forEach(msg => {
-      container.innerHTML += `
-        <div class="log">
-          <strong>${msg.name}</strong>
-          <div>${msg.content}</div>
-        </div>`;
+
+      // Ajuste aqui se seu backend usar outro nome de campo
+      const target = msg.to || msg.whisper_to || msg.target;
+
+      // Só exibe se for realmente sussurro
+      if (target) {
+        container.innerHTML += `
+          <div class="log">
+            <strong>${msg.name}</strong>
+            <span style="color: var(--muted)"> → </span>
+            <strong style="color: var(--success)">${target}</strong>
+          </div>
+        `;
+      }
     });
+
   } catch {
     container.innerText = "Erro ao carregar logs.";
   }
@@ -462,5 +476,6 @@ show("home");
 </script>
 </body>
 </html>
+
 
 
