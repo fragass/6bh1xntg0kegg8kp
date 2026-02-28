@@ -65,14 +65,21 @@ body {
 .main {
   flex:1;
   padding:20px;
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap:16px; /* espaçamento entre os cards */
+  display:flex;
+  flex-direction:column;
+  gap:24px; /* espaçamento entre títulos e seus cards */
   overflow-y:auto;
 }
 
-/* Headers */
-h2 { width:100%; font-size:24px; font-weight:600; margin-bottom:16px; color:#fff; }
+/* Section title */
+.section-title { font-size:24px; font-weight:600; color:#fff; margin-bottom:12px; }
+
+/* Grid de cards */
+.cards-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:16px;
+}
 
 /* Card */
 .card {
@@ -109,7 +116,7 @@ button.danger { background:var(--danger); }
 button.danger:hover { background: var(--danger-hover); }
 
 /* Logs */
-.log { padding:8px; border-radius:10px; background: var(--panel-light); border:1px solid var(--border); margin-bottom:6px; }
+.log { padding:8px; border-radius:10px; background: var(--panel-light); border:1px solid var(--border); margin-bottom:4px; width:100%; overflow:auto; }
 .log strong { color: var(--primary); }
 
 /* Overlay */
@@ -152,70 +159,71 @@ function show(section){
   const c=document.getElementById("content");
 
   if(section==="home"){
-    c.innerHTML=`<h2>Bem vindo!</h2>
-    <div class="card">
-      <strong>Usuários online</strong>
-      <div id="onlineCount" style="font-size:36px; font-weight:700; color:var(--success)">0</div>
-      <div id="onlineList">Carregando...</div>
-    </div>`;
+    c.innerHTML=`<div class="section-title">Bem vindo!</div>
+      <div class="cards-grid">
+        <div class="card">
+          <strong>Usuários online</strong>
+          <div id="onlineCount" style="font-size:36px; font-weight:700; color:var(--success)">0</div>
+          <div id="onlineList">Carregando...</div>
+        </div>
+      </div>`;
     loadOnline();
   }
 
   if(section==="messages"){
-    c.innerHTML=`<h2>Mensagens</h2>
-
-      <!-- Card destacado da senha admin -->
-      <div class="card admin-password">
-        <input type="password" id="passwordAdminMsg" placeholder="Senha Admin">
-      </div>
-
-      <!-- Card apagar mensagens -->
-      <div class="card">
-        <button class="action danger" onclick="deleteMessages()">Apagar todas as mensagens</button>
-      </div>
-
-      <!-- Card apagar imagens -->
-      <div class="card">
-        <button class="action danger" onclick="deleteImages()">Apagar todas as imagens</button>
+    c.innerHTML=`<div class="section-title">Mensagens</div>
+      <div class="cards-grid">
+        <!-- Card senha admin -->
+        <div class="card admin-password">
+          <input type="password" id="passwordAdminMsg" placeholder="Senha Admin">
+        </div>
+        <!-- Card apagar mensagens -->
+        <div class="card">
+          <button class="action danger" onclick="deleteMessages()">Apagar todas as mensagens</button>
+        </div>
+        <!-- Card apagar imagens -->
+        <div class="card">
+          <button class="action danger" onclick="deleteImages()">Apagar todas as imagens</button>
+        </div>
       </div>`;
   }
 
   if(section==="logs"){
-    c.innerHTML=`<h2>Logs de mensagens</h2>
-    <div class="card" style="aspect-ratio:auto;">
-      <div id="logsContainer">Carregando logs...</div>
-    </div>`;
+    c.innerHTML=`<div class="section-title">Logs de mensagens</div>
+      <div class="cards-grid">
+        <div class="card" style="aspect-ratio:auto; min-height:200px;">
+          <div id="logsContainer">Carregando logs...</div>
+        </div>
+      </div>`;
     loadLogs();
   }
 
   if(section==="users"){
-    c.innerHTML=`<h2>Gerenciar Usuários</h2>
-
-      <!-- Card destacado da senha admin -->
-      <div class="card admin-password">
-        <input type="password" id="adminPassword" placeholder="Senha Admin">
-      </div>
-
-      <!-- Card adicionar usuário -->
-      <div class="card">
-        <strong>Adicionar usuário</strong>
-        <input type="text" id="newUsername" placeholder="Username">
-        <input type="text" id="newUserPassword" placeholder="Senha">
-        <button class="action" onclick="addUser()">Adicionar</button>
-      </div>
-
-      <!-- Card remover usuário -->
-      <div class="card">
-        <strong>Remover usuário</strong>
-        <input type="text" id="removeUsername" placeholder="Username">
-        <button class="action danger" onclick="removeUser()">Remover</button>
-      </div>
-
-      <!-- Card ver usuários -->
-      <div class="card">
-        <strong>Ver usuários</strong>
-        <button class="action" onclick="viewUsers()">Ver usuários</button>
-        <div id="userList" style="margin-top:8px;"></div>
+    c.innerHTML=`<div class="section-title">Gerenciar Usuários</div>
+      <div class="cards-grid">
+        <!-- Card senha admin -->
+        <div class="card admin-password">
+          <input type="password" id="adminPassword" placeholder="Senha Admin">
+        </div>
+        <!-- Card adicionar usuário -->
+        <div class="card">
+          <strong>Adicionar usuário</strong>
+          <input type="text" id="newUsername" placeholder="Username">
+          <input type="text" id="newUserPassword" placeholder="Senha">
+          <button class="action" onclick="addUser()">Adicionar</button>
+        </div>
+        <!-- Card remover usuário -->
+        <div class="card">
+          <strong>Remover usuário</strong>
+          <input type="text" id="removeUsername" placeholder="Username">
+          <button class="action danger" onclick="removeUser()">Remover</button>
+        </div>
+        <!-- Card ver usuários -->
+        <div class="card">
+          <strong>Ver usuários</strong>
+          <button class="action" onclick="viewUsers()">Ver usuários</button>
+          <div id="userList" style="margin-top:8px;"></div>
+        </div>
       </div>`;
   }
 }
