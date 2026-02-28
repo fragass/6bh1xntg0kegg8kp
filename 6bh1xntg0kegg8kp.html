@@ -4,7 +4,6 @@
 <link rel="icon" href="favicon.png" type="image/png">
 
 <script>
-  // 🔐 proteção simples (igual antes)
   if (!sessionStorage.getItem("token")) {
     window.location.href = "index.html";
   }
@@ -62,6 +61,18 @@ body {
   transform: translateX(4px);
 }
 
+/* botão sair (igual ao antigo, elegante) */
+.sidebar .logout {
+  margin-top: 12px;
+  border-color: #30363d;
+  color: var(--muted);
+}
+
+.sidebar .logout:hover {
+  background: #1f242c;
+  color: #fff;
+}
+
 /* ===== Main ===== */
 .main {
   flex: 1;
@@ -69,8 +80,6 @@ body {
   overflow-y: auto;
   animation: fadeIn .3s ease;
 }
-
-h2 { margin-top: 0; }
 
 .card {
   max-width: 420px;
@@ -93,7 +102,6 @@ h2 { margin-top: 0; }
   background: var(--bg);
   font-size: 14px;
   margin-bottom: 10px;
-  animation: fadeIn .25s ease;
 }
 
 .log strong { color: var(--primary); }
@@ -183,12 +191,11 @@ button.action:hover {
   <button onclick="show('home')">Início</button>
   <button onclick="show('messages')">Mensagens</button>
   <button onclick="show('logs')">Logs</button>
-  <button onclick="logout()">Sair</button>
+  <button class="logout" onclick="logout()">Sair</button>
 </div>
 
 <div class="main" id="content"></div>
 
-<!-- Overlay -->
 <div class="overlay" id="overlay" onclick="hideOverlay()">
   <div class="modal" id="modal" onclick="event.stopPropagation()">
     <h3 id="modalTitle"></h3>
@@ -238,14 +245,11 @@ show("home");
 
 /* ===== Overlay ===== */
 function showOverlay(type, title, msg) {
-  const overlay = document.getElementById("overlay");
   const modal = document.getElementById("modal");
-
   modal.className = `modal ${type}`;
-  modal.querySelector("#modalTitle").innerText = title;
-  modal.querySelector("#modalMsg").innerText = msg;
-
-  overlay.classList.add("show");
+  document.getElementById("modalTitle").innerText = title;
+  document.getElementById("modalMsg").innerText = msg;
+  document.getElementById("overlay").classList.add("show");
   setTimeout(hideOverlay, 3000);
 }
 
@@ -275,15 +279,10 @@ async function loadLogs() {
 
     data.forEach(msg => {
       const d = new Date(msg.created_at);
-
       container.innerHTML += `
         <div class="log">
           <strong>${escapeHtml(msg.name)}</strong>
-          ${
-            msg.to
-              ? `<span style="color:var(--yellow)"> (sussurro → ${escapeHtml(msg.to)})</span>`
-              : ""
-          }
+          ${msg.to ? `<span style="color:var(--yellow)"> (sussurro → ${escapeHtml(msg.to)})</span>` : ""}
           <time>${d.toLocaleString("pt-BR")}</time>
           <div>${escapeHtml(msg.content)}</div>
         </div>
@@ -295,7 +294,6 @@ async function loadLogs() {
   }
 }
 
-/* ===== Utils ===== */
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text ?? "";
@@ -335,7 +333,6 @@ async function deleteImages() {
     : showOverlay("error", "Erro", data.error);
 }
 
-/* ===== Logout ===== */
 function logout() {
   sessionStorage.removeItem("token");
   window.location.href = "index.html";
