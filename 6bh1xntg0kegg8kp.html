@@ -14,29 +14,22 @@ if (!sessionStorage.getItem("token")) {
 
 <style>
 :root {
-  --bg: #0f141a;
-  --panel: #161b22;
-  --panel-light: #1b2230;
-
+  --bg: #0b0f14;
+  --panel: #151a21;
+  --panel-light: #1b212b;
   --border: rgba(255,255,255,.08);
-  --border-strong: rgba(255,255,255,.14);
-
   --text: #e6edf3;
-  --muted: #9ba3af;
+  --muted: #9aa4b2;
 
-  --primary: #8a2be2;
-  --primary-hover: #7a22cc;
+  --primary: #ffffff;
+  --primary-hover: #f1f1f1;
 
-  --success: #22c55e;
   --danger: #ff4d4f;
-  --danger-hover: #e04344;
+  --danger-hover: #e04446;
+  --success: #22c55e;
 }
 
-* {
-  box-sizing: border-box;
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary) #0b0f14;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -47,12 +40,12 @@ body {
   color: var(--text);
 }
 
-/* ===== SIDEBAR ===== */
+/* Sidebar */
 .sidebar {
   width: 240px;
   background: var(--panel);
   border-right: 1px solid var(--border);
-  padding: 28px 20px;
+  padding: 30px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -63,7 +56,7 @@ body {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text);
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   transition: all .2s ease;
@@ -78,14 +71,14 @@ body {
   margin-top: auto;
   background: var(--danger);
   border: none;
-  color: #fff;
+  color: white;
 }
 
 .sidebar .logout:hover {
   background: var(--danger-hover);
 }
 
-/* ===== MAIN ===== */
+/* Main */
 .main {
   flex: 1;
   padding: 30px;
@@ -96,10 +89,10 @@ h2 {
   margin-top: 0;
   font-size: 26px;
   font-weight: 600;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
-/* ===== CARDS ===== */
+/* Cards */
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -110,32 +103,30 @@ h2 {
 .card {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 22px;
+  border-radius: 14px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.6);
   justify-content: center;
   align-items: center;
   text-align: center;
   min-height: 150px;
-  box-shadow: 0 12px 32px rgba(0,0,0,.45);
 }
 
-/* CARD ADMIN (destaque sutil roxo) */
+/* admin highlight */
 .card.admin {
-  border: 1px solid var(--primary);
-  box-shadow:
-    0 0 0 1px rgba(138,43,226,.25),
-    0 16px 40px rgba(0,0,0,.55);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.25);
 }
 
-/* ===== INPUTS ===== */
+/* Inputs */
 .card input {
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid var(--border);
-  background: #0b0f14;
+  background: var(--bg);
   color: var(--text);
   font-size: 14px;
   text-align: center;
@@ -145,17 +136,17 @@ h2 {
 .card input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(138,43,226,.25);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.15);
 }
 
-/* ===== BUTTONS ===== */
+/* Buttons */
 button.action {
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   font-weight: 600;
   cursor: pointer;
-  background: #0b0f14;
+  background: var(--bg);
   color: var(--text);
   transition: all .2s ease;
   width: 80%;
@@ -164,13 +155,12 @@ button.action {
 
 button.action:hover {
   background: var(--primary-hover);
-  color: #fff;
-  border-color: transparent;
+  color: #000;
 }
 
 button.danger {
   background: var(--danger);
-  color: #fff;
+  color: white;
   border: none;
 }
 
@@ -178,7 +168,7 @@ button.danger:hover {
   background: var(--danger-hover);
 }
 
-/* ===== ONLINE STATUS ===== */
+/* Online */
 .online-count {
   font-size: 28px;
   font-weight: 700;
@@ -192,17 +182,16 @@ button.danger:hover {
   border-radius: 50%;
   display: inline-block;
   margin-right: 8px;
-  box-shadow: 0 0 0 rgba(34,197,94,.6);
-  animation: onlinePulse 1.6s infinite;
+  animation: pulse 1.6s infinite;
 }
 
-@keyframes onlinePulse {
+@keyframes pulse {
   0% { box-shadow: 0 0 0 0 rgba(34,197,94,.6); }
   70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
   100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
 }
 
-/* ===== LOGS ===== */
+/* Logs */
 .log {
   padding: 10px;
   border-radius: 10px;
@@ -219,11 +208,11 @@ button.danger:hover {
   overflow-y: auto;
 }
 
-/* ===== MODAL / OVERLAY ===== */
+/* Overlay */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10,10,10,.75);
+  background: rgba(0,0,0,.7);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -242,42 +231,27 @@ button.danger:hover {
   width: 340px;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 26px;
   text-align: center;
-  box-shadow: 0 20px 50px rgba(0,0,0,.55);
+  box-shadow: 0 12px 35px rgba(0,0,0,.4);
 }
 
-.modal.success {
-  border-color: var(--success);
-}
+.modal.success { border-color: var(--success); }
+.modal.error { border-color: var(--danger); }
 
-.modal.error {
-  border-color: var(--danger);
-}
-
-.modal h3 {
-  margin-top: 0;
-  margin-bottom: 8px;
-}
-
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0b0f14;
-}
-
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #0b0f14; }
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
+  background: #ffffff;
   border-radius: 10px;
   border: 2px solid #0b0f14;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a855f7;
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff #0b0f14;
 }
 </style>
 </head>
@@ -469,6 +443,7 @@ show("home");
 
 </body>
 </html>
+
 
 
 
