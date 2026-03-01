@@ -27,6 +27,7 @@ body{
   color:var(--text);
 }
 
+/* CARD */
 .login-card{
   width:100%;
   max-width:340px;
@@ -37,21 +38,29 @@ body{
   box-shadow:0 25px 60px rgba(0,0,0,.7);
 }
 
+/* FORM */
 #loginForm{
   display:flex;
   flex-direction:column;
 }
 
+/* INPUTS */
 #loginForm input{
   padding:12px 14px;
   background:var(--surface-soft);
   border:1px solid var(--border);
   border-radius:10px;
   color:var(--text);
+  font-size:14px;
+  transition:border-color .15s ease, box-shadow .15s ease;
 }
 
 #loginForm input + input{
   margin-top:8px;
+}
+
+#loginForm input::placeholder{
+  color:var(--muted);
 }
 
 #loginForm input:focus{
@@ -60,24 +69,40 @@ body{
   box-shadow:0 0 0 2px var(--accent-glow);
 }
 
+/* BOTÃO */
 #loginForm button{
   margin-top:22px;
   padding:12px;
   background:var(--surface-soft);
-  border:1px solid var(--border);
+  border:1px solid var(--border); /* neutro */
   border-radius:10px;
   color:var(--text);
+  font-size:14px;
+  font-weight:500;
   cursor:pointer;
+  transition:
+    background .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease,
+    transform .1s ease;
 }
 
 #loginForm button:hover{
-  border-color:var(--accent);
+  background:#1a2028;
+  border-color:var(--accent);        /* roxo só no feedback */
   box-shadow:0 0 12px var(--accent-glow);
 }
 
+#loginForm button:active{
+  transform:translateY(1px);
+  box-shadow:0 0 6px var(--accent-glow);
+}
+
+/* ERROR */
 #errorMsg{
   margin-top:8px;
   font-size:12px;
   text-align:center;
   color:var(--danger);
+  min-height:16px;
 }
